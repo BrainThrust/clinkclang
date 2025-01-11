@@ -123,3 +123,9 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Mastra
+output.txt
+node_modules
+dist
+.env.local
