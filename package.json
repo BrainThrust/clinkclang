@@ -1,0 +1,15 @@
+{
+  "name": "clinkclang",
+  "version": "0.0.1",
+  "description": "monorepo for clinkclang",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": {
+    "name": "BrianLYS",
+    "url": "https://github.com/BrianLYS"
+  },
+  "license": "MIT"
+}
