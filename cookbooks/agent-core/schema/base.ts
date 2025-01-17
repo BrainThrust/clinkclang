@@ -10,6 +10,7 @@ export interface ModelConfig {
   modelName: string;
   temperature?: number; // optional since only available for a few models
   maxTokens?: number;
+  version?: string; // only needed for claude
   [key: string]: any;
 }
 

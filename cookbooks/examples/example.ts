@@ -5,19 +5,17 @@ async function main() {
         providerName: "openai",
         apiKey: 'openai_api_key', 
         modelName: "gpt-4o", // can go to 3.5 turbo 
-        systemPrompt: "You are aan assistant that answers accurately.",
+        systemPrompt: "You are an assistant that answers accurately.",
         temperature: 0.2,
       });
     
       const claudeAgent = new Agent({
         providerName: "claude",
-        apiKey: 'claude_api_key', 
-        modelName: "claude-3-opus-20240229", // have to test claude since I don't have access to an api_key
-        systemPrompt: "You are a helpful assistant that answers accurately.",
-        temperature: 0.2,
-        maxTokens: 200, 
+        apiKey: 'claude_api_key',
+        modelName: "claude-3-opus-20240229",
+        version: "2024-01-01"  // must specify version
       });
-    
+
       const openaiResponse = await openAIAgent.generate("What is the capital of France?");
       console.log("OpenAI:", openaiResponse);
     

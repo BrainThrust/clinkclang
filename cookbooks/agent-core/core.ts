@@ -40,6 +40,7 @@ export interface AgentConfig {
   temperature?: number;
   systemPrompt?: string;
   maxTokens?: number;
+  version?: string;
 }
 
 export class Agent {

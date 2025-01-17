@@ -12,7 +12,7 @@ export class ClaudeProvider extends Base {
       method: "POST",
       headers: {
         "x-api-key": this.config.apiKey,
-        "anthropic-version": "2023-06-01",
+        "anthropic-version": this.config.version || '2023-06-01', // this default version is from the anthropic website: https://docs.anthropic.com/en/api/getting-started
         "Content-Type": "application/json",
       },
 
