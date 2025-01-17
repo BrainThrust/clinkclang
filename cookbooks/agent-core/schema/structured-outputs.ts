@@ -17,5 +17,3 @@ export interface ParsedOutput<A> {
   data?: A;
   errors?: ValidationError[];
 }
-
-  

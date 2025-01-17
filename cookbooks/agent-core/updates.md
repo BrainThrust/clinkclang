@@ -182,15 +182,11 @@ agent-core/
 │   └── openai-provider.ts
 ├── schema/            # (Base types for providers)
 │   └── base.ts
-├── prompts/           # (Prompt generation logic)
-│   └── prompt-builder.ts
-├── utils/             # (Utility functions and classes)
+    └── structured-output.ts
+├── utils/  
 │   └── structured-output-parser.ts
-├── types/             # (Type definitions)
-│   └── structured-output.ts
-├── examples/
-│   └── example.ts     # (Example usage of the Agent)
-└── core.ts            # (Agent class, updated to use new structure)
+├── core.ts
+├── updates.md
 ```
 
 ---
