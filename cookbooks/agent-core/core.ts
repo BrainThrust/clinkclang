@@ -30,6 +30,9 @@ import { Base } from "./providers/base-provider";
 import { OpenAIProvider } from "./providers/openai-provider";
 import { ClaudeProvider } from "./providers/claude-provider";
 import { Message, ModelConfig, ModelResponse } from "./schema/base";
+import { StructuredOutputProcessor } from "./utils/structured-output-parser";
+import { z } from "zod";
+import { SchemaType } from "./schema/structured-outputs";
 
 export type ProviderName = "openai" | "claude" | "huggingface" | "deepseek";
 
@@ -41,15 +44,23 @@ export interface AgentConfig {
   systemPrompt?: string;
   maxTokens?: number;
   version?: string;
+  structure?: {
+    strict?: boolean;
+    maxRetries?: number;
+    debug?: boolean;
+  };
 }
 
 export class Agent {
   provider: Base;
   systemPrompt?: string;
   history: Message[] = [];
+  structuredOutput: StructuredOutputProcessor;
+
   constructor(config: AgentConfig) {
     this.provider = this.createProvider(config);
     this.systemPrompt = config.systemPrompt || "";
+    this.structuredOutput = new StructuredOutputProcessor(config.structure);
     if (this.systemPrompt) {
       this.history.push({ role: "system", content: this.systemPrompt });
     }
@@ -87,5 +98,45 @@ export class Agent {
 
   getHistory(): Message[] {
     return this.history;
+  }
+
+  async generateStructured<A extends z.ZodType>(
+    input: string,
+    schema: A
+  ): Promise<z.infer<A>> {
+    const schemaPrompt = this.structuredOutput.generatePrompt(schema);
+    let fullPrompt = `${input}\n\n${schemaPrompt}`;
+
+    let attempt = 0;
+    let result;
+
+    do {
+      const response = await this.provider.generateResponse([
+        ...this.history,
+        { role: "user", content: fullPrompt },
+      ]);
+
+      result = await this.structuredOutput.parse(
+        schema,
+        response.content,
+        attempt
+      );
+
+      if (!result.success && result.errors) {
+        const errorFeedback = `Previous attempt had these validation errors:\n${result.errors
+          .map((e) => `- ${e.message}`)
+          .join("\n")}\nPlease correct these issues and try again.`;
+
+        fullPrompt = `${input}\n\n${schemaPrompt}\n\n${errorFeedback}`;
+      }
+
+      attempt++;
+    } while (!result.success && attempt < 3);
+
+    if (!result.success) {
+      throw new Error("Failed to generate valid structured output");
+    }
+
+    return result.data;
   }
 }
