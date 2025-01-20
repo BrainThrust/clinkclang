@@ -26,10 +26,10 @@
 // 2. Input Handler
 // 3. Output Formatter (Structured Output)
 
-import { Base } from "./providers/base-provider";
-import { OpenAIProvider } from "./providers/openai-provider";
-import { ClaudeProvider } from "./providers/claude-provider";
-import { Message, ModelConfig, ModelResponse } from "./schema/base";
+import { Base } from "@/agent-core/providers/base-provider";
+import { OpenAIProvider } from "@/agent-core/providers/openai-provider";
+import { ClaudeProvider } from "@/agent-core/providers/claude-provider";
+import { Message, ModelConfig, ModelResponse } from "@/agent-core/schema/base";
 
 export type ProviderName = "openai" | "claude" | "huggingface" | "deepseek";
 

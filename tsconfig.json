@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+      "esModuleInterop": true,
+		  "forceConsistentCasingInFileNames": true,
+		  "isolatedModules": true,
+		  "moduleResolution": "Bundler",
+		  "module": "ES2022",
+		  "target": "ES2022",
+      "skipLibCheck": true,
+      "strict": true,
+      "noUncheckedIndexedAccess": true,
+      "baseUrl": ".",
+      "paths": {
+        "@/agent-core/*": ["packages/agent-core/*"],
+        "@/agent-functions/*": ["packages/agent-functions/*"],
+        "@/agent-tools/*": ["packages/agent-tools/*"],
+        "@/agent-workflows/*": ["packages/agent-workflows/*"],
+        "@/agent-examples/*": ["packages/agent-examples/*"]
+      },
+    }
+  }
+  

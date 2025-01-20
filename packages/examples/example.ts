@@ -1,4 +1,4 @@
-import { Agent } from "../core";
+import { Agent } from "@/agent-core/core";
 
 async function main() { 
     const openAIAgent = new Agent({
