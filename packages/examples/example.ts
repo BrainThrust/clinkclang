@@ -1,4 +1,4 @@
-import { Agent } from "../agent-core/core";
+import { Agent } from "@/agent-core/index";
 import { z } from "zod";
 
 async function generateResponseTest() { 
