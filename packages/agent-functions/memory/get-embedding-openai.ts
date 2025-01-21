@@ -29,8 +29,10 @@ export async function getEmbeddingOpenAI(
   try {
     const parsedResponse: OpenAIEmbeddingResponse =
       OpenAIEmbeddingResponseSchema.parse(embeddingResponse);
+
+    if (parsedResponse.data.length < 0) return OpenAIEmbeddingSchema.parse({});
     const embeddingData: OpenAIEmbedding = OpenAIEmbeddingSchema.parse(
-      parsedResponse.data
+      parsedResponse.data[0]
     );
     return embeddingData;
   } catch (e) {
