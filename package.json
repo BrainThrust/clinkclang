@@ -13,6 +13,13 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@types/tesseract.js": "^2.0.0",
+    "pdf-parse": "^1.1.1",
+    "tesseract.js": "^6.0.0",
     "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "@types/pdf-parse": "^1.1.4"
   }
 }
