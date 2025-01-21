@@ -25,7 +25,7 @@ export class OpenAIProvider extends Base {
 
     const data = await response.json();
 
-    // can return metadat if needed
+    // can return metadata if needed
     return {
       content: data.choices[0].message.content,
     };
