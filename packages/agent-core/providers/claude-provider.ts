@@ -1,35 +1,55 @@
-import { Base } from "./base-provider";
-import { Message, ModelResponse, ModelConfig } from "../schema/base";
+import { Base } from "@/agent-core/providers/base-provider";
+import { Message, ModelResponse, ModelConfig } from "@/agent-core/schema/core-schema";
 
-// creating a claude provider handler class
 export class ClaudeProvider extends Base {
-    constructor(config: ModelConfig) {
-        super(config);
-    }
+  systemPrompt?: string;
 
-    async generateResponse(messages: Message[]): Promise<ModelResponse> {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
+  constructor(config: ModelConfig) {
+    super(config);
+    this.systemPrompt = config.systemPrompt;
+  }
+
+  async generateResponse(messages: Message[]): Promise<ModelResponse> {
+    try {
+      const headers = {
         "x-api-key": this.config.apiKey,
-        "anthropic-version": this.config.version || '2023-06-01', // this default version is from the anthropic website: https://docs.anthropic.com/en/api/getting-started
+        "anthropic-version": this.config.version || "2023-06-01",
         "Content-Type": "application/json",
-      },
+      };
 
-      // can add more parameters if needed
-      body: JSON.stringify({
+      const formattedMessages = messages.map((message) => ({
+        role: message.role === "user" ? "user" : "assistant",
+        content: message.content,
+      }));
+
+      const body = JSON.stringify({
         model: this.config.modelName,
-        messages,
+        messages: formattedMessages,
         max_tokens: this.config.maxTokens,
         temperature: this.config.temperature,
-      }),
-    });
+        system: this.systemPrompt,
+      });
 
-    const data = await response.json();
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: headers,
+        body: body,
+      });
 
-    // can return metadata if needed
-    return {
-      content: data.content[0].text,
-    };
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          `Anthropic API request failed with status ${response.status}: ${JSON.stringify(errorData)}`
+        );
+      }
+
+      const data = await response.json();
+      const content = data.content[0]?.text || "";
+
+      return { content };
+    } catch (error) {
+      console.error("Error generating response with Anthropic:", error);
+      throw error;
+    }
   }
 }
