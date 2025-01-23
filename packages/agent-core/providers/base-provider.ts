@@ -1,15 +1,12 @@
-// import { Message, ModelConfig, ModelResponse } from "../schema/core-schema";
-import { Message, ModelConfig, ModelResponse } from "@/agent-core/schema/core-schema";
+import { Message, ModelConfig, ModelResponse } from '../schema/base';
 
+// abstract base class that defines every what each (model) provider should implement
 export abstract class Base {
-  protected config: ModelConfig;
+    config: ModelConfig
 
-  constructor(config: ModelConfig) {
-    this.config = config;
-  }
+    constructor (config: ModelConfig) {
+        this.config = config
+    }
 
-  abstract generateResponse(
-    messages: Message[],
-    tools?: any[] 
-  ): Promise<ModelResponse>;
+    abstract generateResponse(messages: Message[]): Promise<ModelResponse>;
 }

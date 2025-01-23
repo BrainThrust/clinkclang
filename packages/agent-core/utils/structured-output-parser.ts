@@ -4,7 +4,7 @@ import {
   SchemaType,
   ValidationError,
   ParsedOutput,
-} from "@/agent-core/schema/structured-output-schema";
+} from "../schema/structured-outputs";
 
 export class StructuredOutputProcessor {
   private config: Required<StructuredOutputConfig>;
@@ -21,7 +21,7 @@ export class StructuredOutputProcessor {
   async parse<T extends z.ZodType>(
     schema: T,
     modelResponse: string,
-    attempt = 0,
+    attempt = 0
   ): Promise<ParsedOutput<z.infer<T>>> {
     try {
       // try to parse the response and extract JSON
@@ -45,12 +45,12 @@ export class StructuredOutputProcessor {
         // if in the strict mode and max retries exceeded then throw an error
         if (this.config.strict) {
           throw new Error(
-            `Validation failed after ${this.config.maxRetries} attempts`,
+            `Validation failed after ${this.config.maxRetries} attempts`
           );
         }
       }
 
-      // if the validation is successful
+      // if the validation is successful 
       return {
         success: true,
         data: validation.success ? validation.data : (parsed as z.infer<T>),
@@ -109,7 +109,7 @@ export class StructuredOutputProcessor {
     ].join("\n");
   }
 
-  // i read that passing a JSON directly to the llm is not the best approach and a better way is to describe it in natural language and hence keeping this function here
+  // I read that passing a JSON directly to the llm is not the best approach and a better way is to describe it in natural language and hence keeping this function here
   describeSchema(schema: SchemaType, indent = 0): string {
     const spaces = " ".repeat(indent);
 
@@ -119,7 +119,7 @@ export class StructuredOutputProcessor {
         .map(([key, value]) => {
           const fieldSchema = this.describeSchema(
             value as SchemaType,
-            indent + 2,
+            indent + 2
           );
           return `${spaces}  "${key}": ${fieldSchema}`;
         })
@@ -131,14 +131,14 @@ export class StructuredOutputProcessor {
     if (schema instanceof z.ZodArray) {
       const elementSchema = this.describeSchema(
         schema.element as SchemaType,
-        indent,
+        indent
       );
       return `[${elementSchema}]`;
     }
 
     if (schema instanceof z.ZodEnum) {
-      const values: [string, ...string[]] = schema.options;
-      return `enum(${values.map((v: string) => `"${v}"`).join(", ")})`;
+      const values = schema.options;
+      return `enum(${values.map((v) => `"${v}"`).join(", ")})`;
     }
 
     const typeMap: Record<string, string> = {
