@@ -30,6 +30,7 @@ export interface AgentConfig {
   };
   outputSchema?: Schema;
   retries?: number;
+  sessionId?: string;
 }
 
 // the idea of this was to generate a human-readable description of a tool so that the model can understand it
