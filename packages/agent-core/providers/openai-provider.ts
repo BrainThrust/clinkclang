@@ -60,4 +60,4 @@ export class OpenAIProvider extends Base {
       throw error;
     }
   }
-}
+};
