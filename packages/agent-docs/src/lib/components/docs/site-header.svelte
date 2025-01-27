@@ -1,8 +1,13 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { getStores } from '$app/stores';
+	import LanguageSwitcher from '$lib/components/language-switcher.svelte';
+	import * as m from '$lib/paraglide/messages.js';
+
+	const { page } = getStores();
+
 	let links = [
-		{ name: 'Docs', href: '/docs' },
-		{ name: 'Examples', href: '/examples' }
+		{ name: m.link_to_docs(), href: '/docs' },
+		{ name: m.link_to_community(), href: '/examples' }
 	];
 </script>
 
@@ -21,5 +26,6 @@
 				</a>
 			{/each}
 		</nav>
+		<LanguageSwitcher />
 	</div>
 </header>

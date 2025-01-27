@@ -1,4 +1,20 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from en!"
+	"hello_world": "Hello, {name} from en!",
+	"language": "English",
+	"hero_title": "Our Mission:",
+	"hero_subtitle": "Rapidly build and own your A.I agent stack",
+	"hero_description": "The open-source toolkit for developers who refuse to outsource their AI future",
+	"hero_highlight": "Ship mission-critical AI features 3x faster",
+	"feature_full_stack": "Full Stack AI Sovereignty",
+	"feature_type_safety": "Bulletproof Type Safety",
+	"feature_schema_first": "Schema-First Development",
+	"feature_no_lock_in": "Zero Vendor Lock-In",
+	"feature_enterprise_stack": "Enterprise-Grade Stack",
+	"feature_future_proof": "Future-Proof Architecture",
+	"install_command": "> pnpm i clinkclang",
+	"start_building": "Start Building →",
+	"community_invite": "⭐ Be part of the community",
+	"link_to_docs": "Docs",
+	"link_to_community": "Community"
 }

@@ -1,4 +1,20 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from zh-cn!"
+	"hello_world": "Hello, {name} from zh-cn!",
+	"language": "简体中文",
+	"hero_title": "我们的使命:",
+	"hero_subtitle": "快速构建并拥有您的 A.I 代理栈",
+	"hero_description": "为拒绝将 AI 未来外包的开发者提供的开源工具包",
+	"hero_highlight": "以 3 倍速度交付关键任务的 AI 功能",
+	"feature_full_stack": "全栈 AI 主权",
+	"feature_type_safety": "坚如磐石的类型安全",
+	"feature_schema_first": "以架构为先的发展",
+	"feature_no_lock_in": "零供应商锁定",
+	"feature_enterprise_stack": "企业级栈",
+	"feature_future_proof": "面向未来的架构",
+	"install_command": "> pnpm i clinkclang",
+	"start_building": "开始构建 →",
+	"community_invite": "⭐ 加入社区",
+	"link_to_docs": "文档",
+	"link_to_community": "社区"
 }
