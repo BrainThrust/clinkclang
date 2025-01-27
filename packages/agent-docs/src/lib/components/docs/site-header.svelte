@@ -7,7 +7,7 @@
 
 	let links = [
 		{ name: m.link_to_docs(), href: '/docs' },
-		{ name: m.link_to_community(), href: '/examples' }
+		{ name: m.link_to_blogs(), href: '/blog' }
 	];
 </script>
 
