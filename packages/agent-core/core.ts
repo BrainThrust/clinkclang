@@ -12,7 +12,7 @@ import { ClaudeProvider } from "./providers/claude-provider";
 import { Message, ModelResponse, Schema } from "./schema/core-schema";
 import { Tool } from "../agent-tools/tool-interface";
 import { StructuredOutputProcessor } from "./schema/output-validator";
-import { StrategyName, ReActStrategy, ReflexionStrategy } from "packages/agent-strategies/index";
+import { StrategyName, ReActStrategy, ReflexionStrategy } from "@/agent-strategies/index";
 
 export type ProviderName = "openai" | "claude" | "huggingface" | "deepseek";
 

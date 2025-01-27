@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { StrategyName } from "packages/agent-strategies/index"; 
+import { StrategyName } from "@/agent-strategies/index"; 
 import { Agent } from "@/agent-core/core";
 import { Schema } from "@/agent-core/schema/core-schema";
 
