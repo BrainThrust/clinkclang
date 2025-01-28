@@ -1,8 +1,11 @@
-import { Agent, AgentConfig } from "@/agent-core/core";
+import { StrategyName } from "packages/agent-strategies/index"; 
+import { Agent } from "@/agent-core/core";
 import { ImageProcessorTool } from "@/agent-tools/image-processor";
 import { PDFProcessorTool } from "@/agent-tools/pdf-processor";
 import { z } from "zod";
 import { Schema } from "@/agent-core/schema/core-schema";
+
+const OPENAI_API_KEY = 'openai_api_key';
 
 const imageInvoiceSchema: Schema = {
   name: "InvoiceData",
@@ -33,18 +36,12 @@ const pdfInvoiceSchema: Schema = {
   }),
 };
 
-const imageInvoiceConfig: AgentConfig = {
-  providerName: "openai",
+const baseConfig = {
+  providerName: "openai" as const,
   modelName: "gpt-4o",
-  apiKey: 'openai_api_key', 
-  systemPrompt: `You are an expert invoice processing assistant that extracts structured data from documents. 
-  Follow these steps:
-  1. Analyze the input document
-  2. Select the appropriate tool based on document type
-  3. Extract and validate invoice components
-  4. Maintain strict item-price relationships`,
+  apiKey: OPENAI_API_KEY,
+  systemPrompt: `You are an expert invoice processing assistant...`,
   tools: [ImageProcessorTool, PDFProcessorTool],
-  outputSchema: imageInvoiceSchema,
   structure: {
     strict: true,
     maxRetries: 4,
@@ -52,58 +49,65 @@ const imageInvoiceConfig: AgentConfig = {
   },
 };
 
-const pdfInvoiceConfig: AgentConfig = {
-  providerName: "openai",
-  modelName: "gpt-4o",
-  apiKey: 'openai_api_key', 
-  systemPrompt: `You are an expert invoice processing assistant that extracts structured data from documents. 
-  Follow these steps:
-  1. Analyze the input document
-  2. Select the appropriate tool based on document type
-  3. Extract and validate invoice components
-  4. Maintain strict item-price relationships`,
-  tools: [ImageProcessorTool, PDFProcessorTool],
-  outputSchema: pdfInvoiceSchema,
-  structure: {
-    strict: true,
-    maxRetries: 4,
-    debug: true,
-  },
-};
+async function testStrategy(strategy: StrategyName, filePath: string, schema: Schema) {
+  console.log(`${'-'.repeat(40)}`);
+  console.log(`Testing ${strategy.toUpperCase()} strategy with ${filePath}`);
+  console.log(`${'-'.repeat(40)}\n`);
 
-async function processImageInvoice(filePath: string): Promise<string> {
-  const agent = new Agent(imageInvoiceConfig);
-  const response = await agent.generate(
-    `Analyze the document at "${filePath}". Extract all items, prices, and relevant details.`
-  );
-  return response;
-}
-
-async function processPDFInvoice(filePath: string): Promise<string> {
-  const agent = new Agent(pdfInvoiceConfig);
-  const response = await agent.generate(
-    `Analyze the document at "${filePath}". Extract all items, prices, and relevant details.`
-  );
-  return response;
-}
-
-(async () => {
   try {
-    // test with image file
-    console.log("Testing with image file:");
-    const imageInvoiceData = await processImageInvoice("./samples/invoice.jpg");
-    console.log("\nExtracted Invoice Data (Image):");
-    console.log(JSON.stringify(JSON.parse(imageInvoiceData), null, 2));
+    const agent = new Agent({
+      ...baseConfig,
+      strategy: strategy,
+      structure: {
+        ...baseConfig.structure,
+        debug: true, 
+      }
+    });
 
-    // test with PDF file
-    console.log("\nTesting with PDF file:");
-    const pdfInvoiceData = await processPDFInvoice("./samples/invoice.pdf");
-    console.log("\nExtracted Invoice Data (PDF):");
-    console.log(JSON.stringify(JSON.parse(pdfInvoiceData), null, 2));
+    const response = await agent.generate(
+      `Analyze the document at "${filePath}". Extract all items, prices, and relevant details.`,
+      schema
+    );
 
-    console.log("\nAll tests completed successfully!");
+    console.log(`[${strategy}] SUCCESS:`);
+    console.log(JSON.stringify(JSON.parse(response), null, 2));
+    return true;
   } catch (error) {
-    console.error("Document processing failed:", error);
+    console.error(`[${strategy}] ERROR:`, error instanceof Error ? error.message : error);
+    return false;
+  }
+}
+
+async function runStrategyTests() {
+  const strategies: StrategyName[] = ["react"];
+  
+  for (const strategy of strategies) {
+    await testStrategy(strategy, "./samples/invoice.jpg", imageInvoiceSchema);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    await testStrategy(strategy, "./samples/invoice.pdf", pdfInvoiceSchema);
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    console.log();
+  }
+}
+
+async function extractInvoice() {
+  console.log("STARTING DOCUMENT PROCESSING TESTS");
+  console.log("==================================\n");
+  
+  if (!OPENAI_API_KEY) {
+    console.error("Missing OPENAI_API_KEY environment variable");
     process.exit(1);
   }
-})();
+
+  try {
+    await runStrategyTests();
+    console.log("\nALL STRATEGY TESTS COMPLETED");
+  } catch (error) {
+    console.error("MAIN PROCESS ERROR:", error);
+    process.exit(1);
+  }
+}
+
+extractInvoice().catch(console.error);

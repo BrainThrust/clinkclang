@@ -28,6 +28,5 @@ export const PDFProcessorTool: Tool = {
 async function extractPDFText(filePath: string, maxPages: number): Promise<string> {
   const dataBuffer = await readFile(filePath);
   const data = await pdf(dataBuffer, { max: maxPages });
-  console.log('PDF result:', data.text);
   return data.text;
 }

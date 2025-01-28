@@ -4,10 +4,9 @@ import { Tool } from "@/agent-tools/tool-interface";
 
 export const ImageProcessorTool: Tool = {
   name: "extractImage",
-  description:
-    "Extracts text content from an image file. Use this tool when you need to get text from an image. Input should be a file path.",
+  description: "Extracts text from an image file",
   parameters: z.object({
-    filePath: z.string().describe("The path to the image file"),
+    filePath: z.string().describe("Path to image file, e.g., ./samples/invoice.jpg")
   }),
   execute: async ({ filePath }) => {
     console.log(`[ImageProcessorTool] - Starting OCR on ${filePath}`);

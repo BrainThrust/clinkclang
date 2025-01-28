@@ -15,7 +15,8 @@
         "@/agent-functions/*": ["packages/agent-functions/*"],
         "@/agent-tools/*": ["packages/agent-tools/*"],
         "@/agent-workflows/*": ["packages/agent-workflows/*"],
-        "@/agent-examples/*": ["packages/agent-examples/*"]
+        "@/agent-examples/*": ["packages/agent-examples/*"],
+        "@/agent-strategies/*": ["packages/agent-strategies/*"]
       },
     }
   }
