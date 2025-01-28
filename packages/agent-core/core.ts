@@ -10,6 +10,7 @@ import { ClaudeProvider } from "@/agent-core/providers/claude-provider";
 import { Message, ModelResponse, Schema } from "@/agent-core/schema/core-schema";
 import { Tool } from "@/agent-tools/tool-interface";
 import { StructuredOutputProcessor } from "@/agent-core/schema/output-validator";
+import { Memory } from "./memory/memory";
 
 export type ProviderName = "openai" | "claude" | "huggingface" | "deepseek";
 
@@ -31,6 +32,7 @@ export interface AgentConfig {
   outputSchema?: Schema;
   retries?: number;
   sessionId?: string;
+  memoryStrategy: Memory;
 }
 
 // the idea of this was to generate a human-readable description of a tool so that the model can understand it
