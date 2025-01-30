@@ -1,0 +1,3 @@
+[submodule "sites/docs/themes/duckquill"]
+	path = sites/docs/themes/duckquill
+	url = https://codeberg.org/daudix/duckquill.git
