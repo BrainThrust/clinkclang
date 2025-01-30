@@ -80,6 +80,8 @@ export class Agent {
   retries: number;
   tools: Tool[] = [];
   structuredOutputProcessor: StructuredOutputProcessor;
+  sessionId: string;
+  memoryStrategy: Memory;
 
   constructor(config: AgentConfig) {
     this.provider = this.createProvider(config); // calls the createProvider function to get the provider instance (either OpenAI or Claude)
@@ -88,6 +90,8 @@ export class Agent {
     this.systemPrompt = config.systemPrompt || ""; // system prompt for the agent
     this.tools = config.tools || []; // array of tools. We need to build a set of default tools for the agent (TODO)
     this.structuredOutputProcessor = new StructuredOutputProcessor(config.structure); // config.structure is from AgentConfig
+    this.sessionId = config.sessionId ? config.sessionId : "";
+    this.memoryStrategy = config.memoryStrategy;
 
     // if there are tools, add instructions for using them using describeTools
     if (this.tools.length > 0) {
