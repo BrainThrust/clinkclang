@@ -7,6 +7,15 @@
 </script>
 
 <main class="min-h-screen w-full bg-black font-mono text-[#FF9B5C] dark">
+	<div class="relative">
+		<Hero />
+		<About />
+		<Features />
+		<CodeExample />
+		<Footer />
+	</div>
+
+	<!-- Move overlays after the content -->
 	<!-- CRT Scan lines overlay -->
 	<div
 		class="fixed inset-0 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMiIgaGVpZ2h0PSIyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDBoMnYxSDB6IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz48L3N2Zz4=')]"
@@ -15,13 +24,6 @@
 	<div
 		class="fixed inset-0 pointer-events-none bg-gradient-radial from-transparent via-black/10 to-black/80"
 	></div>
-	<div class="relative">
-		<Hero />
-		<About />
-		<Features />
-		<CodeExample />
-		<Footer />
-	</div>
 </main>
 
 <style>

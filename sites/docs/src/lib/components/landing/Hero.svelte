@@ -84,7 +84,7 @@
 
 	const links = [
 		{ name: m.link_1(), href: '#features' },
-		{ name: m.link_2(), href: '#updates' },
+		{ name: m.link_2(), href: '/blog' },
 		{ name: m.link_3(), href: '#about' }
 	];
 

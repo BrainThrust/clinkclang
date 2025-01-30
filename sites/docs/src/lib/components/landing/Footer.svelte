@@ -3,7 +3,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 </script>
 
-<footer id="contact" class="border-t border-[#FF9B5C]/20">
+<footer id="contact" class="relative z-[60] border-t border-[#FF9B5C]/20">
 	<div class="container mx-auto px-4 py-12">
 		<div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
 			<div class="flex flex-col gap-4">
@@ -32,8 +32,7 @@
 				<h3 class="mb-4 font-semibold tracking-wider">{m.footer_network()}</h3>
 				<ul class="space-y-2 text-sm text-[#FF9B5C]/70">
 					<li>
-						<a href="/blog" class="hover:text-[#FF9B5C] hover:underline">{m.footer_network_1()}</a
-						>
+						<a href="/blog" class="hover:text-[#FF9B5C] hover:underline">{m.footer_network_1()}</a>
 					</li>
 				</ul>
 			</div>
