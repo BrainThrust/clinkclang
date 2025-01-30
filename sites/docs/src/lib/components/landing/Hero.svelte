@@ -180,12 +180,14 @@
 					<Button
 						variant="outline"
 						size="lg"
+						href="/docs"
 						class="border-[#FF9B5C] text-[#FF9B5C] hover:bg-[#FF9B5C]/10"
 						>{m.start_sequence()}</Button
 					>
 					<Button
 						variant="outline"
 						size="lg"
+						href="/docs"
 						class="border-[#FF9B5C]/50 text-[#FF9B5C]/50 hover:bg-[#FF9B5C]/10"
 						>{m.view_docs()}</Button
 					>
