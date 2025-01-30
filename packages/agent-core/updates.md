@@ -257,3 +257,87 @@ agent-tools/
 * **`pdf-parse`:** Extracts text from PDFs. Install: `npm install pdf-parse @types/pdf-parse`
 
 ---
+
+# 27/01/2025
+
+## Agent (`core.ts`)
+
+The `Agent` class is the core component that manages communication between the user, frameworks, and providers. It handles tool execution, conversation flow, and output validation.
+
+**Framework Initialization -** Allows plugging in different strategies (e.g., ReAct, Reflexion).
+
+```typescript
+private initializeFramework(framework?: StrategyName) {
+  switch (framework) {
+    case "react":
+      this.activeFramework = new ReActStrategy(this, ...);
+      break;
+    default:
+      this.activeFramework = new ReActStrategy(this, ...);
+  }
+}
+```
+
+**Tool Management -** Describes and mange the tools available to the LLM.
+
+```typescript
+export function describeTools(tools: Tool[]): string {
+  return `Available Tools:\n${tools.map(describeTool).join("\n---\n")}`;
+}
+```
+
+**Response Generation -** Handles user input and generates responses using the active framework.
+
+```typescript
+async generate(input: string, schema?: Schema): Promise<string> {
+  return this.activeFramework.execute(input, schema?.schema);
+}
+```
+
+## ReAct Strategy (`react.ts`)
+
+The `ReActStrategy` class implements the ReAct reasoning framework, which is set as the default.
+
+**Reasoning Loop -** The idea is to iterate through thought-action-observation steps to solve tasks.
+
+```typescript
+while (iteration < this.maxIterations && !finalAnswer) {
+  const response = await this.generateStep();
+  const parsed = this.parseReactResponse(response.content);
+  // Handle thought, action, and final answer
+}
+```
+
+**Tool Execution -** If there is a tool suggested by the LLM then execute it.
+
+```typescript
+private async executeAction(action: string): Promise<string> {
+  const toolCall = this.agent.extractToolCall({ content: action });
+  const tool = this.agent.tools.find((t: Tool) => t.name === toolCall.name);
+  return await tool.execute(toolCall.arguments);
+}
+```
+
+**Context Management -** Maintains conversation context for multi-step reasoning.
+
+```typescript
+private updateContext(response: string, toolResult: string) {
+  this.currentContext.push(
+    { role: "assistant", content: response },
+    { role: "system", content: `Observation: ${toolResult}` }
+  );
+}
+```
+
+**Output Validation -** Validation of the final answer, if outputSchema is given.
+
+```typescript
+if (schema) {
+  const validation = await this.validateOutput(processed, schema);
+  if (validation.success) {
+    finalAnswer = JSON.stringify(validation.data);
+  }
+}
+```
+
+---

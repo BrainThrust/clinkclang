@@ -7,42 +7,38 @@ import {
 } from "@/agent-core/schema/structured-output-schema";
 
 export class StructuredOutputProcessor {
-  private config: Required<StructuredOutputConfig>;
+  config: Required<StructuredOutputConfig>;
 
   constructor(config: StructuredOutputConfig = {}) {
     this.config = {
       strict: config.strict ?? true,
-      maxRetries: config.maxRetries ?? 2, // the default values can be changed
+      maxRetries: config.maxRetries ?? 2,
       debug: config.debug ?? false,
     };
   }
 
-  // the parse method is the core of the processor
   async parse<T extends z.ZodType>(
     schema: T,
     modelResponse: string,
     attempt = 0,
   ): Promise<ParsedOutput<z.infer<T>>> {
     try {
-      // try to parse the response and extract JSON
       const parsed = this.extractJSON(modelResponse);
+
       if (!parsed) {
         throw new Error("Failed to extract valid JSON from response");
       }
 
-      const validation = schema.safeParse(parsed); // validate the response based on teh schema set
+      const validation = schema.safeParse(parsed);
 
       if (!validation.success) {
-        // handling validation
-        // if the validation is not successful and the maximum number of retries is not exceeded
         if (attempt < this.config.maxRetries) {
           return {
             success: false,
-            errors: [{ message: validation.error.message }], // error backlog
+            errors: [{ message: validation.error.message }],
           };
         }
 
-        // if in the strict mode and max retries exceeded then throw an error
         if (this.config.strict) {
           throw new Error(
             `Validation failed after ${this.config.maxRetries} attempts`,
@@ -50,12 +46,12 @@ export class StructuredOutputProcessor {
         }
       }
 
-      // if the validation is successful
       return {
         success: true,
         data: validation.success ? validation.data : (parsed as z.infer<T>),
       };
     } catch (error) {
+      // DEBUG LOGS
       return {
         success: false,
         errors: [
@@ -69,12 +65,11 @@ export class StructuredOutputProcessor {
 
   extractJSON(text: string): any | null {
     try {
-      // first try to parse the entire text as JSON
       return JSON.parse(text);
-    } catch (error) {
-      // if this parsing fails look for JSON-like structures within the text
-      const jsonPattern = /{[\s\S]*?}(?![\s\S]*?})/; // Improved regex
+    } catch (error) {      
+      const jsonPattern = /{[\s\S]*?}(?![\s\S]*?})/;
       const match = text.match(jsonPattern);
+
       if (match) {
         try {
           return JSON.parse(match[0]);
@@ -112,7 +107,6 @@ export class StructuredOutputProcessor {
   // i read that passing a JSON directly to the llm is not the best approach and a better way is to describe it in natural language and hence keeping this function here
   describeSchema(schema: SchemaType, indent = 0): string {
     const spaces = " ".repeat(indent);
-
     if (schema instanceof z.ZodObject) {
       const shape = schema.shape;
       const properties = Object.entries(shape)
@@ -129,13 +123,16 @@ export class StructuredOutputProcessor {
     }
 
     if (schema instanceof z.ZodArray) {
-      const elementSchema = this.describeSchema(
-        schema.element as SchemaType,
-        indent,
-      );
-      return `[${elementSchema}]`;
+      return `array of ${this.describeSchema(schema.element)}` + 
+        (schema._def.minLength ? ` (min ${schema._def.minLength.value} items)` : "") +
+        (schema.description ? `\n${schema.description}` : "");
     }
-
+    
+    if (schema instanceof z.ZodOptional) {
+      return `${this.describeSchema(schema._def.innerType)} (optional)` +
+        (schema.description ? `\n${schema.description}` : "");
+    }
+  
     if (schema instanceof z.ZodEnum) {
       const values: [string, ...string[]] = schema.options;
       return `enum(${values.map((v: string) => `"${v}"`).join(", ")})`;
@@ -149,4 +146,4 @@ export class StructuredOutputProcessor {
 
     return typeMap[schema._def.typeName] || "any";
   }
-}
+};
