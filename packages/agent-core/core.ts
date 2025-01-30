@@ -168,6 +168,9 @@ export class Agent {
         try {
           const toolResult = await tool.execute(toolCall.arguments);
           
+          // push input into memory
+          this.memoryStrategy.append([input])
+
           // add tool result to history
           this.history.push({
             role: "assistant",
