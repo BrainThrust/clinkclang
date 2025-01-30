@@ -1,28 +1,29 @@
-# sv
+# sites/docs
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+## Purpose
 
-## Creating a project
+This is the documentation site for the [Clinkclang](https://clinkclang.com) library.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Writing documentation
 
-```bash
-# create a new project in the current directory
-npx sv create
+The documentation is written in [Markdown](https://www.markdownguide.org/) and is located in the `sites/docs/src/content` directory.
 
-# create a new project in my-app
-npx sv create my-app
-```
+### Writing new pages
+
+To write new pages, create a new file in the `sites/docs/src/content` directory. The file name should be the slug of the page, and the file should have the `.md` extension. If components are needed, use the `.svx` extension. 
+
+Best practice is found in [example.svx](src/content/example.svx) and [example.md](src/content/example.md).
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
 ```bash
-npm run dev
-
+pnpm install
+pnpm run dev
 # or start the server and open the app in a new browser tab
-npm run dev -- --open
+pnpm run dev -- --open
+
+# Manually compile the paraglide messages
+pnpm run compile
 ```
 
 ## Building
@@ -30,9 +31,7 @@ npm run dev -- --open
 To create a production version of your app:
 
 ```bash
-npm run build
+pnpm run build
 ```
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+You can preview the production build with `pnpm run preview`.
