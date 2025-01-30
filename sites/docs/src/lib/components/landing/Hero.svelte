@@ -4,6 +4,7 @@
 	import { TerminalIcon, XIcon, MenuIcon } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import LanguageSwitcher from '$lib/components/language-switcher.svelte';
 
 	let isMenuOpen = $state(false);
 	let titleVisible = $state(false);
@@ -113,6 +114,7 @@
 				href="/docs"
 				class="border-[#FF9B5C] text-[#FF9B5C] hover:bg-[#FF9B5C]/10">{m.init_button()}</Button
 			>
+			<LanguageSwitcher />
 		</div>
 
 		<!-- Mobile Menu Button -->
@@ -141,6 +143,7 @@
 					class="w-full border-[#FF9B5C] text-[#FF9B5C] hover:bg-[#FF9B5C]/10"
 					>{m.init_button()}</Button
 				>
+				<LanguageSwitcher />
 			</nav>
 		</div>
 	{/if}
@@ -177,7 +180,8 @@
 					<Button
 						variant="outline"
 						size="lg"
-						class="border-[#FF9B5C] text-[#FF9B5C] hover:bg-[#FF9B5C]/10">{m.start_sequence()}</Button
+						class="border-[#FF9B5C] text-[#FF9B5C] hover:bg-[#FF9B5C]/10"
+						>{m.start_sequence()}</Button
 					>
 					<Button
 						variant="outline"
