@@ -37,6 +37,7 @@ export interface AgentConfig {
   strategy?: StrategyName;
   sessionId?: string;
   memoryStrategy: Memory;
+  augments: string[];
 }
 
 // function to describe a tool
@@ -190,8 +191,12 @@ export class Agent {
       retries: this.retries,
       tools: this.tools,
       outputSchema: this.outputSchema,
-      structure: this.structuredOutputProcessor.config
+      structure: this.structuredOutputProcessor.config,
     };
   }
-};
 
+  set augments(input: string[]) {
+    // More logic can be added here in the future.
+    this.augments = input;
+  }
+}
