@@ -1,4 +1,4 @@
-import { Memory } from "./memory";
+import { Memory, MemoryFragment } from "./memory";
 import { getEmbeddingsOpenAI } from "@/agent-functions/memory/get-embeddings-openai";
 import { memoryTable } from "./db/schema";
 import { OpenAIEmbedding } from "@/agent-core/schema/memory";
@@ -69,16 +69,24 @@ export class PgVectorMemory extends Memory {
     const embeddingData = await this.getAndFormatEmbeddings([memory]);
 
     try {
-      return await this.dbClient
+      const memory = await this.dbClient
         .select()
         .from(memoryTable)
         .orderBy(
           l2Distance(memoryTable.embedding, embeddingData[0]?.embedding!)
         )
         .limit(5);
+
+      return memory.map((m) => {
+        return {
+          memory: m.memory,
+          sessionId: m.session_id,
+        };
+      });
     } catch (e) {
       console.error(e);
-    }
+      return [] as MemoryFragment[];
+    } 
   }
 
   async initialize(prompt: string, ssid?: string) {
