@@ -6,15 +6,20 @@
 // User Input → Agent → Framework → Provider → Model → Framework → Tool Execution → Final Output
 
 import { z } from "zod";
-import { Base } from "./providers/base-provider";
-import { OpenAIProvider } from "./providers/openai-provider";
-import { ClaudeProvider } from "./providers/claude-provider";
+import { Base } from "@/agent-core/providers/base-provider";
+import { OpenAIProvider } from "@/agent-core/providers/openai-provider";
+import { ClaudeProvider } from "@/agent-core/providers/claude-provider";
+import { DeepSeekProvider } from "@/agent-core/providers/deepseek-provider";
 import { Message, ModelResponse, Schema } from "./schema/core-schema";
 import { Tool } from "../agent-tools/tool-interface";
 import { StructuredOutputProcessor } from "./schema/output-validator";
-import { StrategyName, ReActStrategy, ReflexionStrategy } from "@/agent-strategies/index";
+import {
+  StrategyName,
+  ReActStrategy,
+  ReflexionStrategy,
+} from "@/agent-strategies/index";
 
-export type ProviderName = "openai" | "claude" | "huggingface" | "deepseek";
+export type ProviderName = "openai" | "claude" | "deepseek";
 
 // config for the agent that defines what can be passed in to the agent
 export interface AgentConfig {
@@ -34,6 +39,7 @@ export interface AgentConfig {
   outputSchema?: Schema;
   retries?: number;
   strategy?: StrategyName;
+  stream?: boolean;
 }
 
 // function to describe a tool
@@ -41,10 +47,16 @@ export function describeTool(tool: Tool): string {
   const params = Object.entries(tool.parameters.shape)
     .map(([key, value]) => {
       const zodType = value as z.ZodTypeAny;
-      const type = zodType instanceof z.ZodString ? "string" :
-        zodType instanceof z.ZodNumber ? "number" :
-        zodType instanceof z.ZodBoolean ? "boolean" :
-        zodType instanceof z.ZodArray ? "array" : "object";
+      const type =
+        zodType instanceof z.ZodString
+          ? "string"
+          : zodType instanceof z.ZodNumber
+          ? "number"
+          : zodType instanceof z.ZodBoolean
+          ? "boolean"
+          : zodType instanceof z.ZodArray
+          ? "array"
+          : "object";
       return `${key}: ${type}${zodType.isOptional() ? "" : " (required)"}`;
     })
     .join(", ");
@@ -80,17 +92,23 @@ export class Agent {
     this.retries = config.retries || 3;
     this.systemPrompt = config.systemPrompt || "";
     this.tools = config.tools || [];
-    this.structuredOutputProcessor = new StructuredOutputProcessor(config.structure);
+    this.structuredOutputProcessor = new StructuredOutputProcessor(
+      config.structure
+    );
 
     // add tools to system prompt if there are any
     if (this.tools.length > 0) {
       const toolsDescription = describeTools(this.tools);
-      this.systemPrompt += `\n${describeTools(this.tools)}\nInstructions:\n1. Use toolCall format\n2. Wait for TOOL RESULT`;
+      this.systemPrompt += `\n${describeTools(
+        this.tools
+      )}\nInstructions:\n1. Use toolCall format\n2. Wait for TOOL RESULT`;
     }
 
     // add output schema to system prompt if there is one. this will be used to validate the output
     if (this.outputSchema) {
-      this.systemPrompt += `\n${this.structuredOutputProcessor.generatePrompt(this.outputSchema.schema)}`;
+      this.systemPrompt += `\n${this.structuredOutputProcessor.generatePrompt(
+        this.outputSchema.schema
+      )}`;
     }
 
     // if there is a system prompt, add it to the history
@@ -102,19 +120,27 @@ export class Agent {
     this.initializeFramework(config.strategy);
   }
 
-  
   // initialize framework if there is one specified, else switch to default
   private initializeFramework(framework?: StrategyName) {
     switch (framework) {
       case "react":
-        this.activeFramework = new ReActStrategy(this, this.structuredOutputProcessor);
+        this.activeFramework = new ReActStrategy(
+          this,
+          this.structuredOutputProcessor
+        );
         break;
       case "reflexion":
-        this.activeFramework = new ReflexionStrategy(this, this.structuredOutputProcessor);
+        this.activeFramework = new ReflexionStrategy(
+          this,
+          this.structuredOutputProcessor
+        );
         break;
       default:
         // set default to the react framework
-        this.activeFramework = new ReActStrategy(this, this.structuredOutputProcessor);
+        this.activeFramework = new ReActStrategy(
+          this,
+          this.structuredOutputProcessor
+        );
     }
   }
 
@@ -138,11 +164,19 @@ export class Agent {
           version: config.version,
           systemPrompt: this.systemPrompt,
         });
+      case "deepseek": // added deepseek case
+        return new DeepSeekProvider({
+          apiKey: config.apiKey,
+          modelName: config.modelName,
+          temperature: config.temperature,
+          maxTokens: config.maxTokens,
+          systemPrompt: this.systemPrompt,
+          stream: config.stream,
+        });
       default:
         throw new Error(`Unsupported provider: ${config.providerName}`);
     }
   }
-
 
   // generate function
   async generate(input: string, schema?: Schema): Promise<string> {
@@ -154,7 +188,9 @@ export class Agent {
   }
 
   // simple regex that parses response for tool call
-  extractToolCall(response: ModelResponse): { name: string; arguments: any } | null {
+  extractToolCall(
+    response: ModelResponse
+  ): { name: string; arguments: any } | null {
     const text = response.content;
     const toolCallRegex = /toolCall:\s*(\w+)\s*\(\s*({.*?})\s*\)/s;
     const match = text.match(toolCallRegex);
@@ -163,7 +199,7 @@ export class Agent {
       try {
         return {
           name: match[1],
-          arguments: JSON.parse(match[2])
+          arguments: JSON.parse(match[2]),
         };
       } catch (e) {
         console.error("Tool argument parsing failed:", e);
@@ -183,8 +219,7 @@ export class Agent {
       retries: this.retries,
       tools: this.tools,
       outputSchema: this.outputSchema,
-      structure: this.structuredOutputProcessor.config
+      structure: this.structuredOutputProcessor.config,
     };
   }
-};
-
+}
