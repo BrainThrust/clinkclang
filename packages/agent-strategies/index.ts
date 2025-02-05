@@ -9,4 +9,4 @@ export {
   ReflexionStrategy
 };
 
-export type FrameworkName = "react" | "reflexion";
+export type StrategyName = "react" | "reflexion";
