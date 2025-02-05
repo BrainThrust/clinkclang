@@ -1,6 +1,5 @@
 import { Base } from "@/agent-core/providers/base-provider";
 import { Message, ModelResponse, ModelConfig } from "@/agent-core/schema/core-schema";
-import { Tool } from "@/agent-tools/tool-interface";
 
 export class OpenAIProvider extends Base {
   constructor(config: ModelConfig) {
@@ -9,7 +8,6 @@ export class OpenAIProvider extends Base {
 
   async generateResponse(
     messages: Message[],
-    tools: Tool[] = []
   ): Promise<ModelResponse> {
     try {
       const headers = {

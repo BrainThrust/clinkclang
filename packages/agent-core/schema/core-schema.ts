@@ -12,8 +12,9 @@ export interface ModelConfig {
   temperature?: number;
   maxTokens?: number;
   version?: string;
+  stream?: boolean; // adding stream option for deepseek provider
   [key: string]: any;
-};
+}
 
 export interface ModelResponse {
   content: string;
