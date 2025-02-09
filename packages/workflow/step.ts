@@ -1,8 +1,20 @@
 import { z, ZodFunction, ZodTypeAny } from 'zod';
 
-type StepContextFunction = (...args: any[]) => any;
+type StepContextFunction = (...args: any[]) => unknown;
 
-type StepContext = {
+export enum ExecutionStatus {
+	Success,
+	Failed,
+	Retry
+}
+
+export type ExecutionOutput = {
+	stepId: string;
+	status: ExecutionStatus;
+	output: unknown;
+};
+
+type StepConfig = {
 	stepId: string;
 	execute: StepContextFunction;
 	argsSchema?: ZodTypeAny[];
@@ -16,10 +28,10 @@ export class Step {
 	argsSchema: ZodTypeAny[];
 	returnSchema: ZodTypeAny;
 
-	constructor(stepContext: StepContext) {
-		this.argsSchema = stepContext.argsSchema ?? [];
-		this.returnSchema = stepContext.returnSchema ?? z.void();
-		this.stepId = stepContext.stepId;
+	constructor(config: StepConfig) {
+		this.argsSchema = config.argsSchema ?? [];
+		this.returnSchema = config.returnSchema ?? z.void();
+		this.stepId = config.stepId;
 
 		if (this.argsSchema.length == 0) {
 			this.stepFunctionSchema = z.function().returns(this.returnSchema);
@@ -27,13 +39,27 @@ export class Step {
 			this.stepFunctionSchema = z
 				.function()
 				.args(this.argsSchema[0] ?? z.undefined(), ...this.argsSchema.slice(1))
-				.returns(this.returnSchema);
+				.returns(z.promise(this.returnSchema));
 		}
 
-		this.stepFunction = this.stepFunctionSchema.implement(stepContext.execute);
+		this.stepFunction = this.stepFunctionSchema.implement(config.execute);
 	}
 
-	async execute(...inputs: any) {
-		await this.stepFunction(...inputs);
+	async execute(...inputs: any): Promise<ExecutionOutput> {
+		try {
+			const output = await this.stepFunction(...inputs);
+			return {
+				stepId: this.stepId,
+				status: ExecutionStatus.Success,
+				output: output
+			};
+		} catch (e) {
+			console.error(e);
+			return {
+				stepId: this.stepId,
+				status: ExecutionStatus.Failed,
+				output: null,
+			};
+		}
 	}
 }
