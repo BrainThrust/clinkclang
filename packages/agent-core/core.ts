@@ -18,6 +18,7 @@ import {
   ReActStrategy,
   ReflexionStrategy,
 } from "@/agent-strategies/index";
+import { Memory } from "./memory/memory";
 
 export type ProviderName = "openai" | "claude" | "deepseek";
 
@@ -39,6 +40,9 @@ export interface AgentConfig {
   outputSchema?: Schema;
   retries?: number;
   strategy?: StrategyName;
+  sessionId?: string;
+  memoryStrategy: Memory;
+  augments: string[];
   stream?: boolean;
 }
 
@@ -83,6 +87,8 @@ export class Agent {
   public retries: number;
   public tools: Tool[] = [];
   public structuredOutputProcessor: StructuredOutputProcessor;
+  sessionId: string;
+  memoryStrategy: Memory;
   private activeFramework?: ReActStrategy | ReflexionStrategy;
 
   // constructor
@@ -95,6 +101,8 @@ export class Agent {
     this.structuredOutputProcessor = new StructuredOutputProcessor(
       config.structure
     );
+    this.sessionId = config.sessionId ? config.sessionId : "";
+    this.memoryStrategy = config.memoryStrategy;
 
     // add tools to system prompt if there are any
     if (this.tools.length > 0) {
@@ -221,5 +229,10 @@ export class Agent {
       outputSchema: this.outputSchema,
       structure: this.structuredOutputProcessor.config,
     };
+  }
+
+  set augments(input: string[]) {
+    // More logic can be added here in the future.
+    this.augments = input;
   }
 }
