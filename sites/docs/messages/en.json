@@ -1,0 +1,53 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"hello_world": "Hello, {name} from en!",
+	"language": "English",
+	"link_1": ">//features",
+	"link_2": ">//updates",
+	"link_3": ">//about",
+	"link_4": ">//docs",
+	"init_button": "Initialize",
+	"system_status": "SYSTEM STATUS: ONLINE",
+
+	"hero_title": "NEXT-GEN A.I LIBRARY",
+	"hero_description": "> PLUG AND PLAY COMPONENTS AND WORKFLOWS...",
+	"hero_description_2": "> INTEGRATES WITH ANY MODELS AND TOOLS",
+	"hero_description_3": "> NO MORE LOCKS IN, JUST LOCK IN",
+
+	"start_sequence": "START SEQUENCE",
+	"view_docs": "VIEW DOCUMENTATION",
+	"about_title": "Revolutionizing Industries with AI",
+	"about_description": "Our mission is to empower the next generation of industry with an AI framework that is as powerful as it is easy to use.",
+
+	"features_title": "CORE SYSTEMS OVERVIEW",
+	"features_description": "> Terminal access granted. Displaying primary system functionalities.",
+	"features_card_1_title": "WORKFLOW ENGINE",
+	"features_card_1_description": "Create and manage complex workflows with ease",
+	"features_card_2_title": "REASONING ENGINE",
+	"features_card_2_description": "Advanced reasoning capabilities for complex tasks",
+	"features_card_3_title": "COMPONENT LIBRARY",
+	"features_card_3_description": "Plug and play components for any task",
+
+	"code_example_title": "CODE PROTOCOLS",
+	"code_example_description": "> Classified implementation examples",
+
+	"footer_subtitle": "AI Operating System v0.01",
+
+	"footer_system": "SYSTEM",
+	"footer_system_1": "> FEATURES",
+	"footer_system_2": "> DOCS",
+
+	"footer_network": "NETWORK",
+	"footer_network_1": "> UPDATES",
+
+	"footer_contact": "CONTACT",
+	"footer_contact_1": "> EMAIL",
+	"footer_contact_2": "> CONSULTING",
+
+	"footer_text_1": "SYSTEM ACTIVE",
+	"footer_text_2": "© ClinkClang - ALL RIGHTS RESERVED",
+
+	"link_to_docs": "Docs",
+	"link_to_blogs": "Blog",
+	"about_button": "Learn More"
+}

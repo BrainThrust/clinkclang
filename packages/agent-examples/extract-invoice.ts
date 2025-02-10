@@ -1,11 +1,13 @@
-import { StrategyName } from "packages/agent-strategies/index"; 
+import { StrategyName } from "@/agent-strategies/index"; 
 import { Agent } from "@/agent-core/core";
 import { ImageProcessorTool } from "@/agent-tools/image-processor";
 import { PDFProcessorTool } from "@/agent-tools/pdf-processor";
 import { z } from "zod";
 import { Schema } from "@/agent-core/schema/core-schema";
+import { ProviderName } from "@/agent-core/core";
 
 const OPENAI_API_KEY = 'openai_api_key';
+const DEEPSEEK_API_KEY = 'deepseek_api_key';
 
 const imageInvoiceSchema: Schema = {
   name: "InvoiceData",
@@ -36,59 +38,86 @@ const pdfInvoiceSchema: Schema = {
   }),
 };
 
-const baseConfig = {
-  providerName: "openai" as const,
-  modelName: "gpt-4o",
-  apiKey: OPENAI_API_KEY,
-  systemPrompt: `You are an expert invoice processing assistant...`,
-  tools: [ImageProcessorTool, PDFProcessorTool],
-  structure: {
-    strict: true,
-    maxRetries: 4,
-    debug: true,
-  },
-};
-
-async function testStrategy(strategy: StrategyName, filePath: string, schema: Schema) {
+async function testStrategy(strategy: StrategyName, provider: ProviderName, filePath: string, schema: Schema) {
   console.log(`${'-'.repeat(40)}`);
   console.log(`Testing ${strategy.toUpperCase()} strategy with ${filePath}`);
   console.log(`${'-'.repeat(40)}\n`);
 
+
   try {
-    const agent = new Agent({
-      ...baseConfig,
-      strategy: strategy,
-      structure: {
-        ...baseConfig.structure,
-        debug: true, 
+    let agent: Agent;
+
+    if (provider === 'openai') {
+      if (!OPENAI_API_KEY) {
+        throw new Error("Missing OPENAI_API_KEY for OpenAI provider");
       }
-    });
+
+      agent = new Agent({
+        providerName: provider,
+        modelName: "gpt-4",
+        apiKey: OPENAI_API_KEY,
+        systemPrompt: `You are an expert invoice processing assistant...`,
+        strategy,
+        tools: [ImageProcessorTool, PDFProcessorTool],
+        structure: {
+          debug: true,
+          maxRetries: 4,
+        },
+        temperature: 0.7,
+        retries: 4,
+      });
+    } else if (provider === 'deepseek') {
+      if (!DEEPSEEK_API_KEY) {
+        throw new Error("Missing DEEPSEEK_API_KEY for DeepSeek provider");
+      }
+
+      agent = new Agent({
+        providerName: provider,
+        modelName: "deepseek-chat",
+        apiKey: DEEPSEEK_API_KEY,
+        systemPrompt: `You are an expert invoice processing assistant...`,
+        strategy,
+        tools: [ImageProcessorTool, PDFProcessorTool],
+        structure: {
+          debug: true,
+          maxRetries: 4,
+        },
+        temperature: 0.7,
+        retries: 4,
+        stream: false,
+      });
+    } else {
+      throw new Error(`Unsupported provider: ${provider}`);
+    }
 
     const response = await agent.generate(
       `Analyze the document at "${filePath}". Extract all items, prices, and relevant details.`,
       schema
     );
 
-    console.log(`[${strategy}] SUCCESS:`);
+    console.log(`[${strategy}/${provider}] SUCCESS:`);
     console.log(JSON.stringify(JSON.parse(response), null, 2));
     return true;
   } catch (error) {
-    console.error(`[${strategy}] ERROR:`, error instanceof Error ? error.message : error);
+    console.error(`[${strategy}/${provider}] ERROR:`, error instanceof Error ? error.message : error);
     return false;
   }
 }
 
 async function runStrategyTests() {
-  const strategies: StrategyName[] = ["react"];
+  const strategies: StrategyName[] = ['react'];
+  const providers: ProviderName[] = ['openai', 'deepseek'];
   
-  for (const strategy of strategies) {
-    await testStrategy(strategy, "./samples/invoice.jpg", imageInvoiceSchema);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    await testStrategy(strategy, "./samples/invoice.pdf", pdfInvoiceSchema);
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    console.log();
+  for (const provider of providers) {
+    for (const strategy of strategies) {
+      await testStrategy(strategy, provider, '@agent-examples/samples/invoice.jpg', imageInvoiceSchema);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      await testStrategy(strategy, provider, '@agent-examples/samples/invoice.pdf', pdfInvoiceSchema);
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+      console.log();
+    }
   }
 }
 
@@ -96,8 +125,8 @@ async function extractInvoice() {
   console.log("STARTING DOCUMENT PROCESSING TESTS");
   console.log("==================================\n");
   
-  if (!OPENAI_API_KEY) {
-    console.error("Missing OPENAI_API_KEY environment variable");
+  if (!OPENAI_API_KEY || !DEEPSEEK_API_KEY) {
+    console.error("Missing API keys: OPENAI_API_KEY or DEEPSEEK_API_KEY");
     process.exit(1);
   }
 
