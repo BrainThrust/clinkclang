@@ -10,7 +10,7 @@ The Agent Core is a flexible system that enables integration with various AI pro
 
 ### Creating an Agent
 
-To create a new agent, use the `Agent` class with a configuration object
+To create a new agent, use the `Agent` class with a configuration object.
 
 ```typescript
 const agent = new Agent({
@@ -119,13 +119,13 @@ Parameters: {param1: type, param2: type}
 Usage: toolCall: toolName({"param": "value"})
 ```
 
-### Frameworks
+### Strategies
 
-The Agent Core supports different frameworks for processing:
+The Agent Core can support diffeerent reasoning strategies for processing (defaulting to ReAct):
 
 - ReAct: Reasoning and Acting framework
 
-The framework can be specified in the agent configuration using the `strategy` parameter. 
+The framework can be specified in the agent configuration using the `strategy` parameter.
 
 ### Usage Example
 
@@ -143,4 +143,4 @@ const agent = new Agent({
 const response = await agent.generate("What's the weather like?");
 ```
 
-For more examples, check the examples directory in the repository.
+For more examples, check the `packages/agent-examples` directory.

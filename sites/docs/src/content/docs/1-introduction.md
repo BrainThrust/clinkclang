@@ -14,12 +14,12 @@ ClinkClang is an open-source TypeScript framework for building AI agent workflow
 
 ### Core Features
 
-- **Flexible Provider System**: Easily switch between different LLM providers (OpenAI, Claude, DeepSeek)
-- **Strategy Based**: Support for different reasoning strategies like ReAct and Reflexion
-- **Tool Integration**: Easy to use interface for adding custom tools and capabilities
-- **Memory Management**: (TODO)
-- **Structured Output**: Schema validation and typed responses using the ZOD library
-- **Built-in Evaluation** : AutoEvals library integration for quality, safety, and task-specific metrics
+- **Flexible Provider System**: Easily switch between different LLM providers (OpenAI, Claude, DeepSeek).
+- **Strategy Based**: Support for different reasoning strategies like ReAct and Reflexion.
+- **Tool Integration**: Easy to use interface for adding custom tools and capabilities.
+- **Memory Management**: (TODO).
+- **Structured Output**: Schema validation and typed responses using the ZOD library.
+- **Built-in Evaluation** : AutoEvals library integration for quality, safety, and task-specific metrics.
 
 ### How It Works
 
@@ -31,12 +31,12 @@ User Input → Agent → Framework → Provider → Model → Framework → Tool
 
 Each component:
 
-* **User** : Input queries and tasks
-* **Agent** : Core orchestrator managing flow
-* **Provider/Model** : LLM integration (OpenAI, Claude, etc)
-* **Strategy** : ReAct/Reflexion reasoning
-* **Tools** : Custom function execution
-* **Output** : Structured, validated responses
+* **User** : Input queries and tasks.
+* **Agent** : Core orchestrator managing flow.
+* **Provider/Model** : LLM integration (OpenAI, Claude, etc).
+* **Strategy** : ReAct/Reflexion reasoning.
+* **Tools** : Custom function execution.
+* **Output** : Structured, validated responses.
 
 ### Future Roadmap
 
