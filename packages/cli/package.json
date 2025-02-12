@@ -1,0 +1,24 @@
+{
+    "name": "clinkclang",
+    "version": "0.1.0",
+    "description": "CLI tool for ClinkClang AI agent framework",
+    "license": "ISC",
+    "type": "module",
+    "bin": {
+        "clinkclang": "dist/bin/index.js"
+    },
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "dev": "tsx bin/index.ts"
+    },
+    "dependencies": {
+        "chalk": "^5.4.1",
+        "commander": "^13.1.0",
+        "prompts": "^2.4.2"
+    },
+    "devDependencies": {
+        "@types/prompts": "^2.4.9",
+        "tsx": "^4.6.0",
+        "typescript": "^5.3.3"
+    }
+}
