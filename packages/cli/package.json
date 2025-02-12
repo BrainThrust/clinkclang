@@ -1,7 +1,7 @@
 {
     "name": "clinkclang",
-    "version": "0.0.2",
-    "author":{
+    "version": "0.0.8",
+    "author": {
         "name": "BrianLYS",
         "url": "https://github.com/BrianLYS"
     },
@@ -9,7 +9,7 @@
     "license": "ISC",
     "type": "module",
     "bin": {
-        "clinkclang": "dist/bin/index.js"
+        "clinkclang": "./dist/bin/index.js"
     },
     "scripts": {
         "build": "tsc -p tsconfig.json",
