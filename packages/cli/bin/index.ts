@@ -1,12 +1,21 @@
 #!/usr/bin/env node
 import { program } from 'commander';
 import { initProject, addComponent } from '../src/cli.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get the directory name of the current module.
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 program
 	.command('version')
 	.description('Show the version number')
 	.action(() => {
-		console.log('clinkclang version 0.1.0');
+		// Construct the path to package.json relative to the current file.
+		const packageJsonPath = path.resolve(__dirname, '../../package.json');
+		const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+		console.log(`clinkclang version ${packageJson.version}`);
 	});
 
 program
