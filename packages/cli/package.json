@@ -1,7 +1,11 @@
 {
     "name": "clinkclang",
-    "version": "0.1.0",
-    "description": "CLI tool for ClinkClang AI agent framework",
+    "version": "0.0.2",
+    "author":{
+        "name": "BrianLYS",
+        "url": "https://github.com/BrianLYS"
+    },
+    "description": "Add clinkclang to your app",
     "license": "ISC",
     "type": "module",
     "bin": {
