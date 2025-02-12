@@ -1,6 +1,7 @@
 {
   "name": "clinkclang",
-  "version": "0.0.2",
+  "private": true,
+  "version": "0.0.1",
   "description": "monorepo for clinkclang",
   "main": "index.js",
   "scripts": {
@@ -31,7 +32,6 @@
     "eslint-plugin-svelte": "^2.46.1",
     "prettier": "^3.4.2",
     "prettier-plugin-svelte": "^3.3.3",
-    "typescript-eslint": "^8.20.0",
-    "@sveltejs/kit": "^2.0.0"
+    "typescript-eslint": "^8.20.0"
   }
 }
