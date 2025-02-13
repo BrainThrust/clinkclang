@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
-import { execSync } from 'child_process';
 import prompts from 'prompts';
 import degit from 'degit';
 import { remoteComponentMapping, DegitOptions } from './config';
@@ -36,24 +35,25 @@ export async function initProject(name?: string) {
 		process.exit(1);
 	}
 
-	// Copy a basic template into the project directory.
-	// (Assume you have a template stored at ../templates/init)
-	const templateDir = path.resolve(__dirname, '../templates/init');
-	if (fs.existsSync(templateDir)) {
-		fs.cpSync(templateDir, projectDir, { recursive: true });
-	} else {
-		console.error(chalk.red('Init template not found!'));
-		process.exit(1);
-	}
+	// Ask where you want library files to be stored
+	const libraryDir = await prompts({
+		type: 'text',
+		name: 'libraryDir',
+		message: 'Where do you want to store your library files?',
+		initial: 'lib'
+	});
 
-	// Optionally install dependencies with pnpm
-	console.log(chalk.green('Installing dependencies...'));
-	try {
-		execSync('pnpm install', { cwd: projectDir, stdio: 'inherit' });
-	} catch (error) {
-		console.error(chalk.red('Failed to install dependencies.'));
-		process.exit(1);
-	}
+	// Create clinkclang.json file in the project directory.
+	fs.writeFileSync(
+		path.resolve(projectDir, 'clinkclang.json'),
+		JSON.stringify(
+			{
+				libraryDir: libraryDir.libraryDir
+			},
+			null,
+			2
+		)
+	);
 
 	console.log(chalk.blue(`Project ${projectName} initialized successfully!`));
 	console.log(chalk.yellow('\nNext steps:'));
@@ -66,6 +66,17 @@ export async function initProject(name?: string) {
  */
 export async function addComponent(component: string) {
 	console.log(chalk.green(`Adding component "${component}" to your ClinkClang project...`));
+
+	// Check for clinkclang.json
+	const clinkclangConfigPath = path.resolve(process.cwd(), 'clinkclang.json');
+	if (!fs.existsSync(clinkclangConfigPath)) {
+		console.error(
+			chalk.red(
+				'Not a ClinkClang project (or any of the parent directories): clinkclang.json not found.'
+			)
+		);
+		process.exit(1);
+	}
 
 	const lowerCaseComponent = component.toLowerCase();
 	const remoteRepo = remoteComponentMapping[lowerCaseComponent];
