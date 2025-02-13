@@ -43,6 +43,9 @@ export async function initProject(name?: string) {
 		initial: 'lib'
 	});
 
+	// Create the library directory
+	fs.mkdirSync(path.resolve(projectDir, libraryDir.libraryDir), { recursive: true });
+
 	// Create clinkclang.json file in the project directory.
 	fs.writeFileSync(
 		path.resolve(projectDir, 'clinkclang.json'),
@@ -89,7 +92,12 @@ export async function addComponent(component: string) {
 	// Construct the degit path, handling subdirectory components.
 	const degitPath = remoteRepo;
 
-	const targetDir = path.resolve(process.cwd(), lowerCaseComponent);
+	// Read clinkclang.json to get the library directory
+	const clinkclangConfig = JSON.parse(fs.readFileSync(clinkclangConfigPath, 'utf8'));
+	const libraryDir = clinkclangConfig.libraryDir;
+
+	// Construct the target directory using the library directory
+	const targetDir = path.resolve(process.cwd(), libraryDir, lowerCaseComponent);
 
 	const degitOptions: DegitOptions = {
 		cache: false,
