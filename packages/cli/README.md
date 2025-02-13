@@ -29,6 +29,11 @@ pnpm link --global
 clinkclang version
 ```
 
+## Publishing
+```bash
+pnpm publish --access public
+```
+
 ## Dependencies:
 - Commander.js: Parse CLI commands/flags
 - Chalk: Terminal styling
