@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import { execSync } from 'child_process';
 import prompts from 'prompts';
 import degit from 'degit';
+import { remoteComponentMapping, DegitOptions } from './config';
 
 /**
  * Initializes a new project.
@@ -62,54 +63,32 @@ export async function initProject(name?: string) {
 
 /**
  * Adds a component to the current project.
- *  - If the component is "core", it fetches only the packages/agent-core subdirectory.
- *  - Otherwise, it fetches the entire repository based on the remoteComponentMapping.
  */
 export async function addComponent(component: string) {
 	console.log(chalk.green(`Adding component "${component}" to your ClinkClang project...`));
 
-	const remoteComponentMapping: Record<string, string> = {
-		'agent-core': 'github:BrainThrust/clinkclang',
-		'agent-evals': 'github:BrainThrust/clinkclang',
-		examples: 'github:BrainThrust/clinkclang',
-		express: 'github:BrainThrust/clinkclang-express'
-	};
+	const lowerCaseComponent = component.toLowerCase();
+	const remoteRepo = remoteComponentMapping[lowerCaseComponent];
 
-	const remoteRepo = remoteComponentMapping[component.toLowerCase()];
 	if (!remoteRepo) {
 		console.error(chalk.red(`Component "${component}" is not recognized.`));
 		process.exit(1);
 	}
 
-	const targetDir = path.resolve(process.cwd(), component.toLowerCase());
+	// Construct the degit path, handling subdirectory components.
+	const degitPath = remoteRepo;
 
-	let degitPath = remoteRepo;
-	const degitOptions: any = {
+	const targetDir = path.resolve(process.cwd(), lowerCaseComponent);
+
+	const degitOptions: DegitOptions = {
 		cache: false,
 		force: true,
-		verbose: true
+		verbose: true,
+		// Only filter and strip if it's a known component from the mapping.
+		...(remoteComponentMapping[lowerCaseComponent] && {
+			strip: 2
+		})
 	};
-
-	// Special handling for the "core" component:
-	if (component.toLowerCase() === 'agent-core') {
-		degitPath = `${remoteRepo}/packages/agent-core`;
-		degitOptions.filter = (file: string) => file.startsWith('packages/agent-core');
-		degitOptions.strip = 2; // Strip "packages/agent-core"
-	}
-
-	// Special handling for the "evals" component:
-	if (component.toLowerCase() === 'agent-evals') {
-		degitPath = `${remoteRepo}/packages/agent-evals`;
-		degitOptions.filter = (file: string) => file.startsWith('packages/agent-evals');
-		degitOptions.strip = 2; // Strip "packages/agent-evals"
-	}
-
-	// Special handling for the "examples" component:
-	if (component.toLowerCase() === 'examples') {
-		degitPath = `${remoteRepo}/packages/examples`;
-		degitOptions.filter = (file: string) => file.startsWith('packages/examples');
-		degitOptions.strip = 2; // Strip "packages/examples"
-	}
 
 	const emitter = degit(degitPath, degitOptions);
 
@@ -118,7 +97,7 @@ export async function addComponent(component: string) {
 		console.log(chalk.green(`Component "${component}" added successfully at ${targetDir}.`));
 	} catch (error) {
 		console.error(chalk.red(`Failed to add component "${component}" from remote repository.`));
-		console.error(chalk.red(String(error)));
+		console.error(chalk.red(String(error))); // More specific error
 		process.exit(1);
 	}
 }
