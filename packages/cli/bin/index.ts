@@ -5,15 +5,20 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Get the directory name of the current module.
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// Get the current file path and directory.
+const currentFile = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(currentFile);
+
+// Check if we're running in development (TypeScript) or production (JavaScript)
+const isDev = currentFile.endsWith('.ts');
+const packageJsonPath = isDev
+	? path.resolve(__dirname, '../package.json')
+	: path.resolve(__dirname, '../../package.json');
 
 program
 	.command('version')
 	.description('Show the version number')
 	.action(() => {
-		// Construct the path to package.json relative to the current file.
-		const packageJsonPath = path.resolve(__dirname, '../../package.json');
 		const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 		console.log(`clinkclang version ${packageJson.version}`);
 	});

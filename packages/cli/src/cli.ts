@@ -3,6 +3,7 @@ import path from 'path';
 import chalk from 'chalk';
 import { execSync } from 'child_process';
 import prompts from 'prompts';
+import degit from 'degit';
 
 /**
  * Initializes a new project.
@@ -60,50 +61,64 @@ export async function initProject(name?: string) {
 }
 
 /**
- * Adds a component (such as "core", "evals", etc.) to the current project.
- *
- * This example assumes that the components are stored in the repository's
- * packages directory and will be copied into the current working directory.
+ * Adds a component to the current project.
+ *  - If the component is "core", it fetches only the packages/agent-core subdirectory.
+ *  - Otherwise, it fetches the entire repository based on the remoteComponentMapping.
  */
 export async function addComponent(component: string) {
 	console.log(chalk.green(`Adding component "${component}" to your ClinkClang project...`));
 
-	// Map component names to directories (adjust these mappings as needed)
-	const componentMapping: Record<string, string> = {
-		core: 'agent-core',
-		evals: 'agent-evals',
-		examples: 'agent-examples',
-		functions: 'agent-functions',
-		strategies: 'agent-strategies',
-		tools: 'agent-tools',
-		workflows: 'agent-workflows'
+	const remoteComponentMapping: Record<string, string> = {
+		'agent-core': 'github:BrainThrust/clinkclang',
+		'agent-evals': 'github:BrainThrust/clinkclang',
+		examples: 'github:BrainThrust/clinkclang',
+		express: 'github:BrainThrust/clinkclang-express'
 	};
 
-	const packageName = componentMapping[component.toLowerCase()];
-	if (!packageName) {
+	const remoteRepo = remoteComponentMapping[component.toLowerCase()];
+	if (!remoteRepo) {
 		console.error(chalk.red(`Component "${component}" is not recognized.`));
 		process.exit(1);
 	}
 
-	// Assume our local packages are in ../packages relative to this CLI code
-	const packagesDir = path.resolve(__dirname, '../..', 'packages');
-	const componentDir = path.join(packagesDir, packageName);
+	const targetDir = path.resolve(process.cwd(), component.toLowerCase());
 
-	if (!fs.existsSync(componentDir)) {
-		console.error(chalk.red(`Component directory for "${component}" not found.`));
-		process.exit(1);
+	let degitPath = remoteRepo;
+	const degitOptions: any = {
+		cache: false,
+		force: true,
+		verbose: true
+	};
+
+	// Special handling for the "core" component:
+	if (component.toLowerCase() === 'agent-core') {
+		degitPath = `${remoteRepo}/packages/agent-core`;
+		degitOptions.filter = (file: string) => file.startsWith('packages/agent-core');
+		degitOptions.strip = 2; // Strip "packages/agent-core"
 	}
 
-	// Decide where to place the component in the user's project.
-	// For this example, we simply copy the component folder into the current directory.
-	const targetDir = path.resolve(process.cwd(), packageName);
+	// Special handling for the "evals" component:
+	if (component.toLowerCase() === 'agent-evals') {
+		degitPath = `${remoteRepo}/packages/agent-evals`;
+		degitOptions.filter = (file: string) => file.startsWith('packages/agent-evals');
+		degitOptions.strip = 2; // Strip "packages/agent-evals"
+	}
+
+	// Special handling for the "examples" component:
+	if (component.toLowerCase() === 'examples') {
+		degitPath = `${remoteRepo}/packages/examples`;
+		degitOptions.filter = (file: string) => file.startsWith('packages/examples');
+		degitOptions.strip = 2; // Strip "packages/examples"
+	}
+
+	const emitter = degit(degitPath, degitOptions);
+
 	try {
-		fs.mkdirSync(targetDir, { recursive: true });
-		fs.cpSync(componentDir, targetDir, { recursive: true });
+		await emitter.clone(targetDir);
+		console.log(chalk.green(`Component "${component}" added successfully at ${targetDir}.`));
 	} catch (error) {
-		console.error(chalk.red(`Failed to add component "${component}".`));
+		console.error(chalk.red(`Failed to add component "${component}" from remote repository.`));
+		console.error(chalk.red(String(error)));
 		process.exit(1);
 	}
-
-	console.log(chalk.green(`Component "${component}" added successfully at ${targetDir}.`));
 }
