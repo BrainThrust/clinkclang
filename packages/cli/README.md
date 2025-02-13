@@ -17,8 +17,12 @@ pnpm dlx clinkclang@latest version
 
 ## Testing locally
 ```bash
-pnpm install
+pnpm run dev -- version
+```
 
+## Testing build locally
+```bash
+pnpm install
 # Link the local package
 pnpm run build
 pnpm link --global
