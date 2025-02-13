@@ -243,7 +243,7 @@ export class ReActStrategy extends BaseStrategy {
   // when we receive an error, we want to prompt the user to correct their previous attempt and the error to be fixed
   private getRetryPrompt(schema: z.ZodSchema, errors?: any[]): string {
     return [
-      // simply join the errors into a string
+      // simply join the errors into a string (maybe need to change?)
       this.outputProcessor.generatePrompt(schema),
       "Previous attempt failed due to:",
       errors?.map((e) => `- ${e.message}`).join("\n") ||
@@ -251,6 +251,7 @@ export class ReActStrategy extends BaseStrategy {
       "Please correct the following issues and try again:",
     ].join("\n");
   }
+
 
   private getErrorRetryPrompt(error: unknown, schema?: z.ZodSchema): string {
     const basePrompt = [

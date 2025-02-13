@@ -64,25 +64,26 @@ export class StructuredOutputProcessor {
   }
 
   extractJSON(text: string): any | null {
+    // remove ```json and ``` from the text
+    const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    
     try {
-      return JSON.parse(text);
-    } catch (error) {      
-      const jsonPattern = /{[\s\S]*?}(?![\s\S]*?})/;
-      const match = text.match(jsonPattern);
-
-      if (match) {
+      return JSON.parse(cleaned);
+    } catch (error) {
+      // handle any malformed json with a much better parsing mechanism
+      const jsonMatch = cleaned.match(/({.*})/s);
+      if (jsonMatch) {
         try {
-          return JSON.parse(match[0]);
-        } catch (error) {
-          console.error("Failed to parse extracted JSON:", error);
-          return null;
+          if (!jsonMatch?.[1]) return null;
+          return JSON.parse(jsonMatch[1]);
+        } catch (e) {
+          console.error("Recovery parse failed:", e);
         }
       }
-      console.error("No JSON found in the response.");
       return null;
     }
   }
-
+  
   // generating the prompt that instructs the llm to generate a structured output
   generatePrompt<A extends z.ZodType>(schema: A): string {
     const schemaDescription = this.describeSchema(schema);
@@ -104,7 +105,7 @@ export class StructuredOutputProcessor {
     ].join("\n");
   }
 
-  // i read that passing a JSON directly to the llm is not the best approach and a better way is to describe it in natural language and hence keeping this function here
+  // I read that passing a JSON directly to the llm is not the best approach and a better way is to describe it in natural language and hence keeping this function here
   describeSchema(schema: SchemaType, indent = 0): string {
     const spaces = " ".repeat(indent);
     if (schema instanceof z.ZodObject) {
