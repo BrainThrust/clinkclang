@@ -3,7 +3,7 @@ import path from 'path';
 import chalk from 'chalk';
 import prompts from 'prompts';
 import degit from 'degit';
-import { remoteComponentMapping, DegitOptions } from './config';
+import { remoteComponentMapping, DegitOptions } from '../src/config.js';
 
 /**
  * Initializes a new project.
