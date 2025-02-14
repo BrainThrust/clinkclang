@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { getStores } from '$app/stores';
-	import LanguageSwitcher from '$lib/components/language-switcher.svelte';
+	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import * as m from '$lib/paraglide/messages.js';
-
+	import LanguageSwitcher from '$lib/components/language-switcher.svelte';
+	import { getStores } from '$app/stores';
 	const { page } = getStores();
 
 	let links = [
@@ -13,6 +13,7 @@
 
 <header class="w-full flex items-center p-4 border-b">
 	<div class="container mx-auto flex items-center space-x-4">
+		<Sidebar.Trigger class="lg:hidden" />
 		<a href="/" class="text-xl font-bold">ClinkClang</a>
 		<nav class="flex space-x-4">
 			{#each links as link}
