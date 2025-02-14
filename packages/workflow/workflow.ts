@@ -1,46 +1,58 @@
-import { Step, ExecutionStatus, ExecutionOutput } from './step';
+import { Step } from './step';
+import {
+	ExecutionStatus,
+	ExecutionOutput,
+	WorkflowContext,
+	InitContext,
+	WorkflowInstance
+} from './types';
+import { AnyZodObject, z } from 'zod';
 
-type WorkflowInput = {
-	workflowName: string;
-};
-
-interface WorkflowContext {
-	workflowName: string;
-	results: { [key: string]: ExecutionOutput };
+interface StepNeighbors {
+	[key: string]: StepNode;
 }
 
-class StepQueue {
-	queue: Step[] = [];
-	ptr: number = 0;
+class StepNode {
+	step: Step;
+	neighbors: StepNeighbors;
+
+	constructor(s: Step) {
+		this.step = s;
+		this.neighbors = {};
+	}
+
+	addPath(sn: StepNode) {
+		this.neighbors[sn.step.stepId] = sn;
+	}
+
+	getNeighbor(stepId: string) {
+		return this.neighbors[stepId];
+	}
+
+	getAllNeighbors() {
+		return this.neighbors;
+	}
+}
+
+class StepGraph {
+	steps: StepNode[];
 	committed: boolean = false;
 
-	push(step: Step) {
+	constructor() {
+		this.steps = [];
+	}
+
+	addSteps(steps: StepNode[]) {
+		if (!this.committed) steps.forEach((s) => this.steps.push(s));
+	}
+
+	addStep(step: StepNode) {
+		if (!this.committed) this.steps.push(step);
+	}
+
+	addEdge(src: StepNode, dest: StepNode) {
 		if (!this.committed) {
-			this.queue.push(step);
-		} else {
-			throw Error(
-				'The queue has already been committed. Flushing the queue will clear it and undo this.'
-			);
-		}
-	}
-
-	peek(): Step | never {
-		if (this.queue.length > 0) {
-			return this.queue[this.ptr]!;
-		} else {
-			throw Error('The queue is currently empty.');
-		}
-	}
-
-	next(): Step | never {
-		if (this.committed && this.queue.length > 0 && this.ptr < this.queue.length) {
-			const currentStep = this.queue[this.ptr]!;
-			this.ptr++;
-			return currentStep;
-		} else if (this.ptr >= this.queue.length) {
-			return this.queue[this.queue.length - 1]!;
-		} else {
-			throw Error('The queue is either currently empty or uncommitted.');
+			src.addPath(dest);
 		}
 	}
 
@@ -48,53 +60,97 @@ class StepQueue {
 		this.committed = true;
 	}
 
-	flush() {
-		this.queue = [];
+	uncommit() {
 		this.committed = false;
-	}
-
-	get length() {
-		return this.queue.length;
 	}
 }
 
-export class Workflow {
+export class Workflow<TInitSchema extends z.ZodType<any> = any> {
 	name: string;
-	stepQueue: StepQueue = new StepQueue();
+	stepGraph: StepGraph = new StepGraph();
 	workflowContext: WorkflowContext;
+	initSchema: TInitSchema;
+	startStep: StepNode | null = null;
+	referStep: StepNode | null = null;
 
-	constructor(workflowInput: WorkflowInput) {
-		this.name = workflowInput.workflowName;
+	constructor(workflowName: string, initSchema: TInitSchema) {
+		this.name = workflowName;
 		this.workflowContext = {
 			workflowName: this.name,
-			results: {}
+			results: {},
+			initData: {}
 		};
+
+		this.initSchema = initSchema;
 	}
 
-	do(step: Step): Workflow {
-		this.stepQueue.push(step);
+	do(step: Step) {
+		const sn = new StepNode(step);
+		this.stepGraph.addStep(sn);
+		this.referStep = sn;
+		this.startStep = sn;
 		return this;
 	}
 
-	then(step: Step): Workflow {
-		this.stepQueue.push(step);
+	then(step: Step) {
+		const sn = new StepNode(step);
+		this.stepGraph.addStep(sn);
+		if (this.referStep != null) this.stepGraph.addEdge(this.referStep, sn);
+		this.referStep = sn;
 		return this;
 	}
 
 	commit() {
-		this.stepQueue.commit();
+		this.stepGraph.commit();
+		return this;
 	}
 
-	async execute() {
-		while (this.stepQueue.ptr < this.stepQueue.length) {
-			const nextStep = this.stepQueue.next();
-			const out = await nextStep.execute();
+	createInstance(): WorkflowInstance<TInitSchema> {
+		return { run: async ({ initData } = {}) => this.execute({ initData }) };
+	}
+
+	async execute(initCtx: InitContext) {
+		if (!this.stepGraph.committed) throw Error('Commit the workflow before executing!');
+		try {
+			const initData = this.initSchema.parse(initCtx.initData);
+			this.workflowContext.initData = initData;
+		} catch (e) {
+			throw Error('initData does not match initSchema.');
+		}
+
+		let node = this.startStep;
+		while (node != null) {
+			let out;
+			try {
+				const executionOutput = await node.step.stepFunction(this.workflowContext);
+				out = {
+					stepId: node.step.stepId,
+					output: executionOutput.output,
+					status: ExecutionStatus.Success
+				} as ExecutionOutput<typeof executionOutput>;
+			} catch (_e) {
+				const e: Error = _e as Error;
+				out = {
+					stepId: node.step.stepId,
+					error: e.message,
+					status: ExecutionStatus.Failed
+				} as ExecutionOutput<null>;
+			}
+
 			this.workflowContext.results[out.stepId] = out;
 
-			if (out.status == ExecutionStatus.Retry) {
-				// try again here, to be implemented
-			} else if (out.status != ExecutionStatus.Success) {
+			if (out.status != ExecutionStatus.Success) {
 				// handle failure
+			}
+
+			// for now, assume no branches
+			const nb = node.getAllNeighbors();
+			const nbValues = Object.values(nb);
+			if (nbValues.length != 0) {
+				const nextNode = nbValues[0]!;
+				node = nextNode;
+			} else {
+				return;
 			}
 		}
 	}

@@ -1,20 +1,20 @@
 import { z } from 'zod';
 
 export enum ExecutionStatus {
-	Success,
-	Failed,
-	Retry
+	Success = 'success',
+	Failed = 'failed',
+	Retry = 'retry'
 }
 
 type ExecutionSuccess<TExecutionOutput> = {
 	stepId: string;
-	status: 'success';
+	status: ExecutionStatus.Success;
 	output: TExecutionOutput;
 };
 
 type ExecutionFailure = {
 	stepId: string;
-	status: 'failed';
+	status: ExecutionStatus.Failed;
 	error: string;
 };
 
@@ -23,7 +23,7 @@ export type ExecutionOutput<TExecutionOutput> =
 	| ExecutionFailure;
 
 export interface InitContext<TInitSchema extends z.ZodType<any> = any> {
-	initData: TInitSchema;
+	initData: z.infer<TInitSchema>;
 }
 
 export interface WorkflowContext<TInitSchema extends z.ZodType<any> = any> {
@@ -33,8 +33,5 @@ export interface WorkflowContext<TInitSchema extends z.ZodType<any> = any> {
 }
 
 export interface WorkflowInstance<TInit extends z.ZodType<any>> {
-	run: (options?: { initData?: z.infer<TInit> | undefined }) => Promise<{
-		initData?: z.infer<TInit>;
-		results: Record<string, ExecutionOutput<any>>;
-	}>;
+	run: (options?: { initData?: z.infer<TInit> | undefined }) => Promise<void>;
 }
