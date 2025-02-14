@@ -1,9 +1,12 @@
 <script lang="ts">
-	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+	import Menu from 'lucide-svelte/icons/menu';
+	import * as Drawer from '$lib/components/ui/drawer/index.js';
 	import * as m from '$lib/paraglide/messages.js';
 	import LanguageSwitcher from '$lib/components/language-switcher.svelte';
 	import { getStores } from '$app/stores';
 	const { page } = getStores();
+
+	let { data } = $props();
 
 	let links = [
 		{ name: m.link_to_docs(), href: '/docs' },
@@ -13,7 +16,26 @@
 
 <header class="w-full flex items-center p-4 border-b">
 	<div class="container mx-auto flex items-center space-x-4">
-		<Sidebar.Trigger class="lg:hidden" />
+		<Drawer.Root>
+			<Drawer.Trigger>
+				<Menu class="lg:hidden" />
+			</Drawer.Trigger>
+			<Drawer.Content>
+				<Drawer.Header class="mb-4">
+					<Drawer.Title>Documentation</Drawer.Title>
+				</Drawer.Header>
+				{#each data.docs as doc}
+					<Drawer.Close>
+						<a href="/docs/{doc.slug}" class="block">
+							<div class="px-4 py-2 hover:bg-muted rounded-md flex items-center">
+								{doc.title}
+							</div>
+						</a>
+					</Drawer.Close>
+				{/each}
+			</Drawer.Content>
+		</Drawer.Root>
+
 		<a href="/" class="text-xl font-bold">ClinkClang</a>
 		<nav class="flex space-x-4">
 			{#each links as link}

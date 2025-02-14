@@ -103,6 +103,9 @@ importers:
       typescript:
         specifier: ^5.0.0
         version: 5.7.3
+      vaul-svelte:
+        specifier: 1.0.0-next.3
+        version: 1.0.0-next.3(svelte@5.19.3)
       vite:
         specifier: ^6.0.0
         version: 6.0.11(@types/node@22.10.10)(jiti@1.21.7)(yaml@2.7.0)
@@ -2041,6 +2044,12 @@ packages:
       svelte:
         optional: true
 
+  svelte-toolbelt@0.4.6:
+    resolution: {integrity: sha512-k8OUvXBUifHZcAlWeY/HLg/4J0v5m2iOfOhn8fDmjt4AP8ZluaDh9eBFus9lFiLX6O5l6vKqI1dKL5wy7090NQ==}
+    engines: {node: '>=18', pnpm: '>=8.7.0'}
+    peerDependencies:
+      svelte: ^5.0.0-next.126
+
   svelte-toolbelt@0.7.0:
     resolution: {integrity: sha512-i/Tv4NwAWWqJnK5H0F8y/ubDnogDYlwwyzKhrspTUFzrFuGnYshqd2g4/R43ds841wmaFiSW/HsdsdWhPOlrAA==}
     engines: {node: '>=18', pnpm: '>=8.7.0'}
@@ -2177,6 +2186,12 @@ packages:
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  vaul-svelte@1.0.0-next.3:
+    resolution: {integrity: sha512-bqlCc28z1I6f23Sjv5W6UlNJdAPeX8tZbYZ3+ycOn/4hTvv2fo/5Le4bAX26RyFkpT6n5FXXCZN1/uNs8biyrQ==}
+    engines: {node: '>=18', pnpm: '>=8.7.0'}
+    peerDependencies:
+      svelte: ^5.0.0
 
   vfile-message@2.0.4:
     resolution: {integrity: sha512-DjssxRGkMvifUOJre00juHoP9DPWuzjxKuMDrhNbk2TdaYYBNMStsNhEOt3idrtI12VQYM/1+iM0KOzXi4pxwQ==}
@@ -4309,6 +4324,12 @@ snapshots:
     optionalDependencies:
       svelte: 5.19.3
 
+  svelte-toolbelt@0.4.6(svelte@5.19.3):
+    dependencies:
+      clsx: 2.1.1
+      style-to-object: 1.0.8
+      svelte: 5.19.3
+
   svelte-toolbelt@0.7.0(svelte@5.19.3):
     dependencies:
       clsx: 2.1.1
@@ -4465,6 +4486,12 @@ snapshots:
       punycode: 2.3.1
 
   util-deprecate@1.0.2: {}
+
+  vaul-svelte@1.0.0-next.3(svelte@5.19.3):
+    dependencies:
+      bits-ui: 1.0.0-next.80(svelte@5.19.3)
+      svelte: 5.19.3
+      svelte-toolbelt: 0.4.6(svelte@5.19.3)
 
   vfile-message@2.0.4:
     dependencies:
