@@ -1,0 +1,30 @@
+{
+    "name": "clinkclang",
+    "version": "0.0.9",
+    "author": {
+        "name": "BrianLYS",
+        "url": "https://github.com/BrianLYS"
+    },
+    "description": "Add clinkclang to your app",
+    "license": "ISC",
+    "type": "module",
+    "bin": {
+        "clinkclang": "./dist/bin/index.js"
+    },
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "dev": "tsx bin/index.ts"
+    },
+    "dependencies": {
+        "chalk": "^5.4.1",
+        "commander": "^13.1.0",
+        "degit": "^2.8.4",
+        "prompts": "^2.4.2"
+    },
+    "devDependencies": {
+        "@types/degit": "^2.8.6",
+        "@types/prompts": "^2.4.9",
+        "tsx": "^4.6.0",
+        "typescript": "^5.3.3"
+    }
+}

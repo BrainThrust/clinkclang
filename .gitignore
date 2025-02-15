@@ -21,15 +21,12 @@ venv.bak/
 !.env.example
 !.env.test
 
-# Mastra
-output.txt
+# Build
 node_modules
 dist
-.env.local
 
 # Svelte
 test-results
-node_modules
 
 # Output
 .output
