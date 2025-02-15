@@ -29,7 +29,7 @@
 						{/each}
 					</nav>
 				</aside>
-				<main class="col-span-9">
+				<main class="col-span-12 lg:col-span-9">
 					{@render children()}
 				</main>
 			</div>

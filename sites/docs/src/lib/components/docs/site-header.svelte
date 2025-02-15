@@ -37,7 +37,7 @@
 		</Drawer.Root>
 
 		<a href="/" class="text-xl font-bold">ClinkClang</a>
-		<nav class="flex space-x-4">
+		<nav class="space-x-4 hidden lg:flex">
 			{#each links as link}
 				<a
 					href={link.href}

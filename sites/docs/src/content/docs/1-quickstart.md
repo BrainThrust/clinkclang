@@ -1,10 +1,9 @@
 ---
-layout: githubMarkdownLight
+layout: docs
 title: Quickstart
 date: '2025-02-13'
 description: 'Quickstart guide to the Agent Docs'
 ---
-# Quickstart
 
 How to setup clinkclang in your project.
 
