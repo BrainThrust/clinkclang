@@ -10,7 +10,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const theme = 'github-dark';
 const highlighter = await createHighlighter({
     themes: [theme],
-    langs: ['javascript', 'typescript']
+    langs: ['bash', 'javascript', 'typescript']
 });
 
 /** @type {import('@sveltejs/kit').Config} */
