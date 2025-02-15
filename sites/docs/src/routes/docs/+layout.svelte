@@ -1,5 +1,6 @@
 <script lang="ts">
 	import SiteHeader from '$lib/components/docs/site-header.svelte';
+	import Separator from '$lib/components/ui/separator/separator.svelte';
 	let { children, data } = $props();
 </script>
 
@@ -10,23 +11,19 @@
 			<div class="grid grid-cols-12 gap-6">
 				<!-- Sidebar -->
 				<aside class="col-span-3 hidden lg:block">
-					<nav class="flex flex-col gap-2">
+					<nav class="flex flex-col">
+						<!-- ClinkClang Docs -->
+						<h2 class="font-semibold p-2">ClinkClang Docs</h2>
 						{#each data.docs as doc}
 							<a
 								href="/docs/{doc.slug}"
-								class="block p-2 bg-card hover:bg-muted rounded-lg transition-colors"
+								class="block p-1.5 px-4 bg-card hover:bg-muted rounded-lg transition-colors relative text-sm text-muted-foreground hover:text-foreground"
 							>
-								<h2 class="font-semibold hover:text-primary">
-									{doc.title}
-								</h2>
-								<time class="text-sm text-muted-foreground">
-									{new Date(doc.date).toLocaleDateString()}
-								</time>
-								{#if doc.description}
-									<p class="mt-1 text-muted-foreground text-sm">{doc.description}</p>
-								{/if}
+								{doc.title}
 							</a>
 						{/each}
+						<!-- Components (Coming Soon) -->
+						<h2 class="font-semibold p-2">Components (Coming Soon)</h2>
 					</nav>
 				</aside>
 				<main class="col-span-12 lg:col-span-9">
