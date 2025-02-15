@@ -139,6 +139,7 @@
 					>
 				{/each}
 				<Button
+					href="/docs"
 					variant="outline"
 					class="w-full border-[#FF9B5C] text-[#FF9B5C] hover:bg-[#FF9B5C]/10"
 					>{m.init_button()}</Button
