@@ -30,8 +30,12 @@ export const load: PageServerLoad = async () => {
 		)
 	);
 
-	// Return sorted posts with most recent first
+	// Return sorted docs with order of appearance, based on the number in the filename
 	return {
-		docs: docs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+		docs: docs.sort((a, b) => {
+			const aNum = parseInt(a.slug?.split('-')[0] ?? '0');
+			const bNum = parseInt(b.slug?.split('-')[0] ?? '0');
+			return aNum - bNum;
+		})
 	};
 };
