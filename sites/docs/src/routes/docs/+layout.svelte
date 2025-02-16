@@ -1,6 +1,5 @@
 <script lang="ts">
 	import SiteHeader from '$lib/components/docs/site-header.svelte';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
 	let { children, data } = $props();
 </script>
 
@@ -24,6 +23,14 @@
 						{/each}
 						<!-- Components (Coming Soon) -->
 						<h2 class="font-semibold p-2">Components (Coming Soon)</h2>
+						{#each data.components as component}
+							<a
+								href="/docs/{component.slug}"
+								class="block p-1.5 px-4 bg-card hover:bg-muted rounded-lg transition-colors relative text-sm text-muted-foreground hover:text-foreground"
+							>
+								{component.title}
+							</a>
+						{/each}
 					</nav>
 				</aside>
 				<main class="col-span-12 lg:col-span-9">

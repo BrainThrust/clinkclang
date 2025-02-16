@@ -1,0 +1,42 @@
+---
+layout: docs
+title: Tracker
+date: '2025-02-16'
+description: 'Agent Docs'
+---
+
+<script lang="ts">
+	import * as Tabs from '$lib/components/ui/tabs';
+	import * as Tracker from '$lib/components/ai/tracker/index.js';
+</script>
+
+A simple tracker component that displays the current state of the agent
+
+<Tabs.Root value="preview">
+	<Tabs.List>
+		<Tabs.Trigger value="preview">Preview</Tabs.Trigger>
+		<Tabs.Trigger value="code">Code</Tabs.Trigger>
+	</Tabs.List>
+	<Tabs.Content value="preview">
+
+		<Tracker.Tracker />
+
+	</Tabs.Content>
+	<Tabs.Content value="code">
+
+```js
+<script lang="ts">
+	import Tracker from '$lib/components/ai/tracker/index.js';
+</script>
+
+<Tracker.Tracker />
+```
+
+	</Tabs.Content>
+</Tabs.Root>
+
+## Installation
+
+```bash
+pnpm dlx clinkclang@latest add tracker
+```

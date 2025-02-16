@@ -10,10 +10,8 @@ interface MdsvexFile {
 	};
 }
 
-// SvelteKit server load function to fetch and process blog posts
 export const load: PageServerLoad = async () => {
-	// Fetch all Markdown/MDSvex files from the blog content directory
-	// and process them in parallel using Promise.all
+	// Fetch all Markdown/MDSvex files from the docs content directory
 	const docs = await Promise.all(
 		Object.entries(import.meta.glob<MdsvexFile>('/src/content/docs/*.{md,svx}')).map(
 			async ([path, resolver]) => {
@@ -30,9 +28,29 @@ export const load: PageServerLoad = async () => {
 		)
 	);
 
-	// Return sorted docs with order of appearance, based on the number in the filename
+	// Fetch all components from the components directory
+	const components = await Promise.all(
+		Object.entries(import.meta.glob<MdsvexFile>('/src/content/components/*.{md,svx}')).map(
+			async ([path, resolver]) => {
+				const { metadata } = await resolver();
+				const slug = path
+					.split('/')
+					.pop()
+					?.replace(/\.(md|svx)$/, '');
+				return { ...metadata, slug };
+			}
+		)
+	);
+
 	return {
+		// Return sorted docs with order of appearance
+		// E.g. 0-introduction.md, 1-getting-started.md...
 		docs: docs.sort((a, b) => {
+			const aNum = parseInt(a.slug?.split('-')[0] ?? '0');
+			const bNum = parseInt(b.slug?.split('-')[0] ?? '0');
+			return aNum - bNum;
+		}),
+		components: components.sort((a, b) => {
 			const aNum = parseInt(a.slug?.split('-')[0] ?? '0');
 			const bNum = parseInt(b.slug?.split('-')[0] ?? '0');
 			return aNum - bNum;

@@ -1005,3 +1005,8 @@
 .markdown-body ::-webkit-calendar-picker-indicator {
 	filter: invert(50%);
 }
+
+.copy-button {
+	/* Use Tailwind classes */
+	@apply absolute top-2 right-2 bg-secondary text-secondary-foreground rounded border p-1 flex items-center justify-center hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-ring;
+}
