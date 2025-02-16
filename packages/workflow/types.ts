@@ -6,6 +6,11 @@ export enum ExecutionStatus {
 	Retry = 'retry'
 }
 
+export type WorkflowConfig<TInitSchema> = {
+	workflowName: string;
+	initSchema: TInitSchema;
+};
+
 type ExecutionSuccess<TExecutionOutput> = {
 	stepId: string;
 	status: ExecutionStatus.Success;

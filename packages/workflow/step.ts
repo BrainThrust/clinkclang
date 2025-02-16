@@ -1,5 +1,5 @@
 import { ZodTypeAny, z } from 'zod';
-import { ExecutionOutput, WorkflowContext, ExecutionStatus } from './types';
+import { WorkflowContext } from './types';
 
 type StepConfig = {
 	stepId: string;

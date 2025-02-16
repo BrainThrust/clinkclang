@@ -4,9 +4,10 @@ import {
 	ExecutionOutput,
 	WorkflowContext,
 	InitContext,
-	WorkflowInstance
+	WorkflowInstance,
+	WorkflowConfig
 } from './types';
-import { AnyZodObject, z } from 'zod';
+import { z } from 'zod';
 
 interface StepNeighbors {
 	[key: string]: StepNode;
@@ -64,11 +65,6 @@ class StepGraph {
 		this.committed = false;
 	}
 }
-
-type WorkflowConfig<TInitSchema> = {
-	workflowName: string;
-	initSchema: TInitSchema;
-};
 
 export class Workflow<TInitSchema extends z.ZodType<any> = any> {
 	name: string;
