@@ -1008,9 +1008,5 @@
 
 .copy-button {
 	/* Use Tailwind classes */
-	@apply absolute top-2 right-2 rounded border p-1 flex items-center justify-center focus:outline-none;
-    /* Github Dark Mode Styles */
-    @apply bg-gray-800 text-gray-200;
-    @apply hover:bg-gray-700;
-    @apply border-gray-600;
+	@apply absolute top-2 right-2 bg-secondary text-secondary-foreground rounded border p-1 flex items-center justify-center hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-ring;
 }
