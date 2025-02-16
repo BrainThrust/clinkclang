@@ -65,6 +65,11 @@ class StepGraph {
 	}
 }
 
+type WorkflowConfig<TInitSchema> = {
+	workflowName: string;
+	initSchema: TInitSchema;
+};
+
 export class Workflow<TInitSchema extends z.ZodType<any> = any> {
 	name: string;
 	stepGraph: StepGraph = new StepGraph();
@@ -73,7 +78,7 @@ export class Workflow<TInitSchema extends z.ZodType<any> = any> {
 	startStep: StepNode | null = null;
 	referStep: StepNode | null = null;
 
-	constructor(workflowName: string, initSchema: TInitSchema) {
+	constructor({ workflowName, initSchema }: WorkflowConfig<TInitSchema>) {
 		this.name = workflowName;
 		this.workflowContext = {
 			workflowName: this.name,
@@ -126,22 +131,25 @@ export class Workflow<TInitSchema extends z.ZodType<any> = any> {
 				out = {
 					stepId: node.step.stepId,
 					output: executionOutput.output,
-					status: ExecutionStatus.Success
+					status: ExecutionStatus.Success,
+					...(node.step.retriesExecuted > 0 && { retries: node.step.retriesExecuted })
 				} as ExecutionOutput<typeof executionOutput>;
 			} catch (_e) {
 				const e: Error = _e as Error;
 				out = {
 					stepId: node.step.stepId,
 					error: e.message,
-					status: ExecutionStatus.Failed
+					status: ExecutionStatus.Failed,
+					...(node.step.retriesExecuted > 0 && { retries: node.step.retriesExecuted })
 				} as ExecutionOutput<null>;
 			}
 
-			this.workflowContext.results[out.stepId] = out;
-
-			if (out.status != ExecutionStatus.Success) {
-				// handle failure
+			if (out.status == ExecutionStatus.Failed && node.step.retries > 0) {
+				node.step.updateRetries();
+				continue;
 			}
+
+			this.workflowContext.results[out.stepId] = out;
 
 			// for now, assume no branches
 			const nb = node.getAllNeighbors();

@@ -3,7 +3,10 @@ import { ExecutionStatus, WorkflowContext } from 'packages/workflow/types';
 import { Workflow } from 'packages/workflow/workflow';
 import { z } from 'zod';
 
-const testWorkflow = new Workflow('test-workflow', z.object({ initValue: z.number() }));
+const testWorkflow = new Workflow({
+	workflowName: 'test-workflow',
+	initSchema: z.object({ initValue: z.number() })
+});
 
 const testOne = new Step({
 	stepId: 'addOneToNumber',
@@ -30,7 +33,8 @@ const testThree = new Step({
 			const inp = ctx.results.doubleNumber.output;
 			return { output: inp - 5 };
 		}
-	}
+	},
+	retries: 10
 });
 
 const workflowInstance = testWorkflow

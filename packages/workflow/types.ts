@@ -10,12 +10,14 @@ type ExecutionSuccess<TExecutionOutput> = {
 	stepId: string;
 	status: ExecutionStatus.Success;
 	output: TExecutionOutput;
+	retries?: number;
 };
 
 type ExecutionFailure = {
 	stepId: string;
 	status: ExecutionStatus.Failed;
 	error: string;
+	retries?: number;
 };
 
 export type ExecutionOutput<TExecutionOutput> =
