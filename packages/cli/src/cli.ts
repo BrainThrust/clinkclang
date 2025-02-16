@@ -3,7 +3,7 @@ import path from 'path';
 import chalk from 'chalk';
 import prompts from 'prompts';
 import degit from 'degit';
-import { remoteComponentMapping, DegitOptions } from '../src/config.js';
+import { DegitOptions, remoteComponentMapping } from '../src/config.js';
 
 /**
  * Initializes a new project.
@@ -43,8 +43,8 @@ export async function initProject(name?: string) {
 		initial: 'lib'
 	});
 
-	// Create the library directory
-	fs.mkdirSync(path.resolve(projectDir, libraryDir.libraryDir), { recursive: true });
+	// Create an ai folder in the library directory
+	fs.mkdirSync(path.resolve(projectDir, libraryDir.libraryDir, 'ai'), { recursive: true });
 
 	// Create clinkclang.json file in the project directory.
 	fs.writeFileSync(
@@ -82,30 +82,33 @@ export async function addComponent(component: string) {
 	}
 
 	const lowerCaseComponent = component.toLowerCase();
-	const remoteRepo = remoteComponentMapping[lowerCaseComponent];
+	const remoteComponent = remoteComponentMapping[lowerCaseComponent];
 
-	if (!remoteRepo) {
+	if (!remoteComponent) {
 		console.error(chalk.red(`Component "${component}" is not recognized.`));
 		process.exit(1);
 	}
 
 	// Construct the degit path, handling subdirectory components.
-	const degitPath = remoteRepo;
+	const degitPath = remoteComponent.url;
 
 	// Read clinkclang.json to get the library directory
 	const clinkclangConfig = JSON.parse(fs.readFileSync(clinkclangConfigPath, 'utf8'));
 	const libraryDir = clinkclangConfig.libraryDir;
 
-	// Construct the target directory using the library directory
-	const targetDir = path.resolve(process.cwd(), libraryDir, lowerCaseComponent);
+	// Construct the target directory based on component type.
+	const targetDir = path.resolve(process.cwd(), libraryDir, 'ai', lowerCaseComponent);
 
 	const degitOptions: DegitOptions = {
 		cache: false,
 		force: true,
 		verbose: true,
-		// Only filter and strip if it's a known component from the mapping.
-		...(remoteComponentMapping[lowerCaseComponent] && {
+		// strip 2 levels for logic and strip 7 levels for components
+		...(remoteComponent.type === 'logic' && {
 			strip: 2
+		}),
+		...(remoteComponent.type === 'component' && {
+			strip: 7
 		})
 	};
 

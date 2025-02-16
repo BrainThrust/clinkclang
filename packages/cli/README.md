@@ -16,6 +16,7 @@ pnpm dlx clinkclang@latest add agent-functions
 pnpm dlx clinkclang@latest add agent-strategies
 pnpm dlx clinkclang@latest add agent-tools
 pnpm dlx clinkclang@latest add agent-workflows
+pnpm dlx clinkclang@latest add tracker
 
 # Show version
 pnpm dlx clinkclang@latest version
@@ -24,6 +25,7 @@ pnpm dlx clinkclang@latest version
 ## Testing locally
 ```bash
 pnpm run dev -- version
+pnpm run dev -- add agent-core
 ```
 
 ## Testing build locally
