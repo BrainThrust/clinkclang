@@ -2,10 +2,8 @@
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"hello_world": "Hello, {name} from en!",
 	"language": "English",
-	"link_1": ">//features",
-	"link_2": ">//updates",
-	"link_3": ">//about",
-	"link_4": ">//docs",
+	"link_1": ">//updates",
+	"link_2": ">//docs",
 	"init_button": "Initialize",
 	"system_status": "SYSTEM STATUS: ONLINE",
 
@@ -16,26 +14,11 @@
 
 	"start_sequence": "START SEQUENCE",
 	"view_docs": "VIEW DOCUMENTATION",
-	"about_title": "Revolutionizing Industries with AI",
-	"about_description": "Our mission is to empower the next generation of industry with an AI framework that is as powerful as it is easy to use.",
-
-	"features_title": "CORE SYSTEMS OVERVIEW",
-	"features_description": "> Terminal access granted. Displaying primary system functionalities.",
-	"features_card_1_title": "WORKFLOW ENGINE",
-	"features_card_1_description": "Create and manage complex workflows with ease",
-	"features_card_2_title": "REASONING ENGINE",
-	"features_card_2_description": "Advanced reasoning capabilities for complex tasks",
-	"features_card_3_title": "COMPONENT LIBRARY",
-	"features_card_3_description": "Plug and play components for any task",
-
-	"code_example_title": "CODE PROTOCOLS",
-	"code_example_description": "> Classified implementation examples",
 
 	"footer_subtitle": "AI Operating System v0.01",
 
 	"footer_system": "SYSTEM",
-	"footer_system_1": "> FEATURES",
-	"footer_system_2": "> DOCS",
+	"footer_system_1": "> DOCS",
 
 	"footer_network": "NETWORK",
 	"footer_network_1": "> UPDATES",

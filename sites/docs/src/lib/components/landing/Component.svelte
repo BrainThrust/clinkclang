@@ -1,17 +1,11 @@
 <script lang="ts">
 	import Hero from './Hero.svelte';
-	import Features from './Features.svelte';
-	import CodeExample from './CodeExample.svelte';
 	import Footer from './Footer.svelte';
-	import About from './About.svelte';
 </script>
 
 <main class="min-h-screen w-full bg-black font-mono text-[#FF9B5C] dark">
 	<div class="relative">
 		<Hero />
-		<About />
-		<Features />
-		<CodeExample />
 		<Footer />
 	</div>
 

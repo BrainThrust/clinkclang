@@ -83,9 +83,8 @@
 	});
 
 	const links = [
-		{ name: m.link_1(), href: '#features' },
-		{ name: m.link_2(), href: '/blog' },
-		{ name: m.link_3(), href: '#about' }
+		{ name: m.link_1(), href: '/blog' },
+		{ name: m.link_2(), href: '/docs' }
 	];
 
 	setTimeout(() => {
