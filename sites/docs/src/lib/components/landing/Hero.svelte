@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { slide } from 'svelte/transition';
 	import { Button } from '$lib/components/ui/button';
-	import { TerminalIcon, XIcon, MenuIcon } from 'lucide-svelte';
+	import { TerminalIcon, XIcon, MenuIcon, GithubIcon } from 'lucide-svelte';
+	import SocialLinks from '$lib/components/landing/SocialLinks.svelte';
 	import { onMount } from 'svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import LanguageSwitcher from '$lib/components/language-switcher.svelte';
@@ -97,23 +98,27 @@
 		<div class="flex items-center gap-2">
 			<TerminalIcon class="size-8 text-[#FF9B5C] animate-pulse" />
 			<span class="text-xl font-bold tracking-wider">ClinkClang</span>
+
+			<div class="hidden items-center ml-6 gap-6 md:flex">
+				{#each links as link}
+					<a
+						href={link.href}
+						class="text-sm tracking-wider text-[#FF9B5C]/70 transition-colors hover:text-[#FF9B5C] hover:underline"
+						>{link.name}</a
+					>
+				{/each}
+			</div>
 		</div>
 
 		<!-- Desktop Navigation -->
 		<div class="hidden items-center gap-6 md:flex">
-			{#each links as link}
-				<a
-					href={link.href}
-					class="text-sm tracking-wider text-[#FF9B5C]/70 transition-colors hover:text-[#FF9B5C] hover:underline"
-					>{link.name}</a
-				>
-			{/each}
 			<Button
 				variant="outline"
 				href="/docs"
 				class="border-[#FF9B5C] text-[#FF9B5C] hover:bg-[#FF9B5C]/10">{m.init_button()}</Button
 			>
 			<LanguageSwitcher />
+			<SocialLinks />
 		</div>
 
 		<!-- Mobile Menu Button -->
@@ -144,6 +149,7 @@
 					>{m.init_button()}</Button
 				>
 				<LanguageSwitcher />
+				<SocialLinks />
 			</nav>
 		</div>
 	{/if}

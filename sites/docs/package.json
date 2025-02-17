@@ -16,6 +16,7 @@
 		"compile": "npx @inlang/paraglide-js compile --project ./project.inlang --outdir ./src/paraglide"
 	},
 	"devDependencies": {
+		"@iconify/svelte": "^4.2.0",
 		"@inlang/paraglide-js": "^1.11.8",
 		"@playwright/test": "^1.49.1",
 		"@sveltejs/adapter-vercel": "^5.5.2",
