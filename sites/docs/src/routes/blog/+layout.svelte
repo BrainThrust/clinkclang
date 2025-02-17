@@ -4,6 +4,6 @@
 </script>
 
 <div class="bg-white">
-	<SiteHeader />
+	<SiteHeader data={data} />
 	{@render children()}
 </div>

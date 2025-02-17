@@ -12,6 +12,8 @@
 		{ name: m.link_to_docs(), href: '/docs' },
 		{ name: m.link_to_blogs(), href: '/blog' }
 	];
+
+	let currentPath = $page.url.pathname;
 </script>
 
 <header class="w-full flex items-center p-4 border-b">
@@ -21,30 +23,43 @@
 				<Menu class="lg:hidden" />
 			</Drawer.Trigger>
 			<Drawer.Content>
-				<Drawer.Header class="flex items-center justify-start">
-					<Drawer.Title>Documentation</Drawer.Title>
+				<Drawer.Header class="flex items-center justify-start gap-2">
+					<Drawer.Title>Links</Drawer.Title>
 				</Drawer.Header>
-				{#each data.docs as doc}
+				{#each links as link}
 					<Drawer.Close>
-						<a href="/docs/{doc.slug}" class="block">
-							<div class="px-4 py-2 hover:bg-muted rounded-md flex items-center">
-								{doc.title}
-							</div>
+						<a href={link.href} class="px-4 py-2 hover:bg-muted rounded-md flex items-center">
+							{link.name}
 						</a>
 					</Drawer.Close>
 				{/each}
-				<Drawer.Header class="flex items-center justify-start">
-					<Drawer.Title>Components</Drawer.Title>
-				</Drawer.Header>
-				{#each data.components as component}
-					<Drawer.Close>
-						<a href="/docs/{component.slug}" class="block">
-							<div class="px-4 py-2 hover:bg-muted rounded-md flex items-center">
-								{component.title}
-							</div>
-						</a>
-					</Drawer.Close>
-				{/each}
+
+				{#if currentPath.startsWith('/docs')}
+					<Drawer.Header class="flex items-center justify-start">
+						<Drawer.Title>Documentation</Drawer.Title>
+					</Drawer.Header>
+					{#each data.docs as doc}
+						<Drawer.Close>
+							<a href="/docs/{doc.slug}" class="block">
+								<div class="px-4 py-2 hover:bg-muted rounded-md flex items-center">
+									{doc.title}
+								</div>
+							</a>
+						</Drawer.Close>
+					{/each}
+					<Drawer.Header class="flex items-center justify-start">
+						<Drawer.Title>Components</Drawer.Title>
+					</Drawer.Header>
+					{#each data.components as component}
+						<Drawer.Close>
+							<a href="/docs/{component.slug}" class="block">
+								<div class="px-4 py-2 hover:bg-muted rounded-md flex items-center">
+									{component.title}
+								</div>
+							</a>
+						</Drawer.Close>
+					{/each}
+				{/if}
 			</Drawer.Content>
 		</Drawer.Root>
 
