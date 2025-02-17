@@ -1,11 +1,11 @@
 ---
 layout: docs
-title: State Machine
+title: Workflow Tracker
 date: '2025-02-17'
 description: 'Evaluating agent responses with AutoEvals'
 ---
 
-The Clinkclang State Machine is a module designed to help build and track your workflows seamlessly.
+The Workflow Tracker is a module designed to help build and track your workflows seamlessly through a state machine and type-safe step definitions.
 
 ## Creating your workflow
 ### Creating a new Workflow instance
