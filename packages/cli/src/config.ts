@@ -33,6 +33,14 @@ export const remoteComponentMapping: Record<string, RemoteComponent> = {
 		url: 'github:BrainThrust/clinkclang/packages/agent-workflows#dev-0.01',
 		type: 'logic'
 	},
+	workflow: {
+		url: 'github:BrainThrust/clinkclang/packages/workflow#dev-0.01',
+		type: 'logic'
+	},
+	'workflow-examples': {
+		url: 'github:BrainThrust/clinkclang/packages/workflow-examples#dev-0.01',
+		type: 'logic'
+	},
 	tracker: {
 		url: 'github:BrainThrust/clinkclang/sites/docs/src/lib/components/ai/tracker#dev-0.01',
 		type: 'component'
