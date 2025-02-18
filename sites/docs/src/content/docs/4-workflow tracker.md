@@ -7,6 +7,15 @@ description: 'Evaluating agent responses with AutoEvals'
 
 The Workflow Tracker is a module designed to help build and track your workflows seamlessly through a state machine and type-safe step definitions.
 
+## Installation
+```bash
+# Add the workflow package
+pnpm run dev -- add workflow
+
+# Add the workflow-examples package
+pnpm run dev -- add workflow-examples
+```
+
 ## Creating your workflow
 ### Creating a new Workflow instance
 ```typescript
