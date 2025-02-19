@@ -1,16 +1,16 @@
-import { Base } from "@/agent-core/providers/base-provider";
+import { BaseProvider } from "@/agent-core/providers/base-provider";
 import {
   Message,
   ModelResponse,
   ModelConfig,
 } from "@/agent-core/schema/core-schema";
 
-export class DeepSeekProvider extends Base {
+export class DeepSeekProvider extends BaseProvider {
     constructor(config: ModelConfig) {
       super(config);
     }
   
-    async generateResponse(messages: Message[]): Promise<ModelResponse> {
+    async generate(messages: Message[]): Promise<ModelResponse> {
       try {
         const headers = {
           "Content-Type": "application/json",

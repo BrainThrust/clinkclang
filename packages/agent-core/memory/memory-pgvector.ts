@@ -1,7 +1,7 @@
 import { Memory } from "./memory";
 import { getEmbeddingsOpenAI } from "@/agent-functions/memory/get-embeddings-openai";
 import { memoryTable } from "./db/schema";
-import { OpenAIEmbedding } from "@/agent-core/schema/memory";
+import { OpenAIEmbedding } from "@/agent-core/schema/memory-shcema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, l2Distance } from "drizzle-orm";
 import { config } from "dotenv";

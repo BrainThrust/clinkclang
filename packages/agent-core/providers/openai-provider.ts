@@ -1,7 +1,7 @@
-import { Base } from "@/agent-core/providers/base-provider";
+import { BaseProvider } from "@/agent-core/providers/base-provider";
 import { Message, ModelResponse, ModelConfig } from "@/agent-core/schema/core-schema";
 
-export class OpenAIProvider extends Base {
+export class OpenAIProvider extends BaseProvider {
   constructor(config: ModelConfig) {
     super(config);
   }

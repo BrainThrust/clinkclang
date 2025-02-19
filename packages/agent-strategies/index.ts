@@ -1,12 +1,11 @@
 import { ReActStrategy } from "./react";
-import { ReflexionStrategy } from "./reflexion";
 import { BaseStrategy } from "./base";
+import { ReflexionStrategy } from "./reflexion";
 
-// a central export for all the frameworks
 export { 
   BaseStrategy,
   ReActStrategy, 
-  ReflexionStrategy
+  ReflexionStrategy,
 };
 
 export type StrategyName = "react" | "reflexion";

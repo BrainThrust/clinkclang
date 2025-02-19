@@ -1,267 +1,234 @@
-import { BaseStrategy } from "packages/agent-strategies/base";
 import { z } from "zod";
-import { Message } from "@/agent-core/schema/core-schema";
-import { describeTools } from "@/agent-core/core";
-import { ModelResponse } from "@/agent-core/schema/core-schema";
-import { Tool } from "@/agent-tools/tool-interface";
+import { BaseStrategy } from "./base";
+import { Agent } from "@/agent-core/core";
+import { Message, ModelResponse } from "@/agent-core/schema/core-schema";
 
-// system prompt to guide ReAct
-// this is buggy. needs to be fixed as its calling tools that dont exist.
-const REACT_SYSTEM_PROMPT = `
-You must follow the ReAct reasoning format. Structure your response as:
+const REACT_SYSTEM_PROMPT = (hasTools: boolean, hasSchema: boolean) => `
+### Role:
+You are a reasoning agent using ReAct framework to solve the user's task. Follow these core rules:
+1. Always begin with Thought: analysis
+2. ${hasTools ? "Use tools only when necessary" : "No tools available"}
+3. Final Answer must be ${hasSchema ? "valid JSON" : "plain text"}
+${hasTools ? "4. Tool parameters must be valid JSON objects" : ""}
 
-Thought: [your analytical reasoning about the task]
-Action: toolCall:[tool_name]({parameters}) 
-Observation: [tool result]
-... (repeat as needed)
+### Response Requirements:
+${
+  hasSchema 
+  ? `1. Directly answer the original question
+2. Use EXACT structure: { "key": value }
+3. Never describe/explain the schema
+4. Only include real data values
+5. Maintain JSON validity at all times`
+  : "Provide clear, concise response in plain text"
+}
 
-Final Answer: [structured response${"{{SCHEMA_NOTE}}"}]
-
-Guidelines:
-1. Carefully analyze the problem before taking action
-${"{{TOOL_GUIDELINES}}"}${"{{SCHEMA_GUIDELINES}}"}
-5. Always conclude with Final Answer when task is complete
+### Process:
+Thought: <analyze problem step-by-step>
+${
+  hasTools 
+  ? `Action: toolCall:<tool_name>(<valid JSON parameters>)
+Observation: <tool result>`
+  : ""
+}
+Final Answer: ${hasSchema ? "{\"key\": <value>}" : "<answer>"}
 `.trim();
 
 export class ReActStrategy extends BaseStrategy {
-  private maxIterations = 5;
-  private currentContext: Message[] = [];
+  private maxIterations = 4; // modify the code to allow the user to configure this value
+  private context: Message[] = [];
+  private debug: boolean;
 
-  // this is the main function
+  constructor(agent: Agent) {
+    super(agent);
+    this.debug = agent.config?.structure?.debug ?? false;
+  }
+
+  private debugLog(...args: any[]) {
+    if (this.debug) {
+      console.log('[DEBUG]', ...args);
+    }
+  }
+
   async execute(input: string, schema?: z.ZodSchema): Promise<string> {
+    this.debugLog('Starting execution with input:', input);
 
-    // initialize context
-    this.initializeContext(input, schema);
+    this.context = this.initializeContext(input, Boolean(schema));
     let iteration = 0;
     let finalAnswer = "";
-    let currentContent = input;
 
-    // if debug is on, print out the tools available
-    if (this.agent.config.structure?.debug) {
-      if (schema) console.log("Output schema required");
-      if (this.agent.tools.length)
-        console.log(
-          `Tools available: ${this.agent.tools
-            .map((t: Tool) => t.name)
-            .join(", ")}`
-        );
-    }
-
-    // while we have not reached the max iterations and we have not found the final answer then keep trying
     while (iteration < this.maxIterations && !finalAnswer) {
+      this.debugLog(`\n--- Iteration ${iteration + 1} ---`);
+      
       try {
-
-        // first step is to get response.
-        // if debug is on, print out the prompt
         const response = await this.generateStep();
-        // parse the response to get thought, action, and final answer
-        const parsed = this.parseReactResponse(response.content);
+        this.debugLog('Generated response:', response.content);
 
-        if (this.agent.config.structure?.debug) {
-          if (parsed.thought) console.log(`\nTHOUGHT: ${parsed.thought}`);
-          if (parsed.action) console.log(`ACTION: ${parsed.action}`);
-          if (parsed.finalAnswer)
-            console.log(`FINAL ANSWER ATTEMPT: ${parsed.finalAnswer}`);
+        const { thought, action, answer } = this.parseResponse(response.content);
+        
+        if (thought) {
+          this.debugLog('[Thought]', thought);
         }
 
-        // if there is a final answer then validate it only if there is a schema
-        if (parsed.finalAnswer) {
-          const processed = await this.processToolOutput(
-            parsed.finalAnswer,
-            schema
+        if (action) {
+          const toolCall = this.parseToolCall(action);
+          if (toolCall) {
+            this.debugLog(
+              `[Action] Calling tool: ${toolCall.name}`,
+              'with parameters:',
+              JSON.stringify(toolCall.args, null, 2)
+            );
+          }
+          
+          const toolResult = await this.executeAction(action);
+          this.debugLog('[Tool Result]', toolResult);
+          
+          this.context.push(
+            { role: "assistant", content: response.content },
+            { role: "system", content: `Observation: ${toolResult}` }
           );
-
-          if (schema) {
-            // use schema to validate from the structured output processor
-            const validation = await this.validateOutput(processed, schema);
-            if (validation.success) {
-              finalAnswer = JSON.stringify(validation.data);
-              if (this.agent.config.structure?.debug) {
-                console.log("\nVALIDATION SUCCEEDED");
-              }
-              break;
-            }
-
-            // if debug is on, print out the errors
-            if (this.agent.config.structure?.debug) {
-              console.log("\nVALIDATION FAILED");
-              console.log(
-                "Errors:",
-                validation.errors
-                  ?.map((e: { message: string }) => e.message)
-                  .join("\n")
-              );
-            }
-
-            // if there are errors then prompt the user to correct their previous attempt
-            currentContent = this.getRetryPrompt(schema, validation.errors);
-          } else {
-            finalAnswer = processed;
-            break;
-          }
         }
 
-        // if there is an action then execute it
-        if (parsed.action) {
-          if (this.agent.config.structure?.debug) {
-            console.log("\nEXECUTING ACTION");
+        if (answer) {
+          this.debugLog('[Proposed Answer]', answer);
+          finalAnswer = await this.validateAnswer(answer, schema) || "";
+          
+          if (finalAnswer) {
+            this.debugLog('[Validated Answer]', finalAnswer);
           }
-
-          // execute the action or tool
-          const toolResult = await this.executeAction(parsed.action);
-
-          if (this.agent.config.structure?.debug) {
-            console.log(`RECEIVED TOOL RESULT!`);
-          }
-
-          // update the context
-          this.updateContext(response.content, toolResult);
         }
 
         iteration++;
       } catch (error) {
-        if (this.agent.config.structure?.debug) {
-          console.log("\nERROR OCCURRED:");
-          console.error(error instanceof Error ? error.message : error);
+        this.debugLog(
+          '[Error]', 
+          error instanceof Error ? error.message : 'Unknown error',
+          '\nRetrying with error context...'
+        );
+        
+        if (error instanceof Error) {
+          this.context.push({
+            role: "system",
+            content: `Error: ${error.message}`
+          });
         }
-
-        if (iteration >= this.maxIterations) throw error;
+        
         iteration++;
-        currentContent = this.getErrorRetryPrompt(error, schema);
       }
     }
 
-    // if we have not found the final answer within the max iterations then throw an error
     if (!finalAnswer) {
-      throw new Error("Max ReAct iterations reached");
-    }
-
-    if (this.agent.config.structure?.debug) {
-      console.log("\nFINAL ANSWER:");
-      console.log(JSON.stringify(JSON.parse(finalAnswer), null, 2));
-      console.log("\nPROCESS COMPLETE");
+      throw new Error(`Failed after ${this.maxIterations} iterations`);
     }
 
     return finalAnswer;
   }
 
-  private async generateStep(): Promise<ModelResponse> {
-    return this.agent.provider.generateResponse(this.currentContext);
-  }
-
-  // the initialize context function works in a way where if there are tools or a schema, the system prompt has additional instructions
-  private initializeContext(input: string, schema?: z.ZodSchema) {
-    const hasTools = this.agent.tools.length > 0;
-    const hasSchema = !!schema;
-
-    //  if there are tools, add them to the system prompt using the describeTools function
-    const toolSection = hasTools
-      ? `Available Tools:\n${describeTools(this.agent.tools)}\n`
-      : "";
-
-    const schemaNote = hasSchema
-      ? " following the required schema EXACTLY"
-      : "";
-
-    const toolGuidelines = hasTools
-      ? `
-        2. Validate tool parameters match their schemas
-        3. Handle errors gracefully - retry with corrected parameters if needed
-        4. Combine multiple observations to form complete answers`
-      : "";
-
-    // this could be done in a better way
-    const schemaGuidelines = hasSchema
-      ? `
-      5. Validate final answer against schema constraints
-      6. Format output as valid JSON`
-      : "";
-
-    this.currentContext = [
-      ...this.agent.getHistory(),
+  private initializeContext(input: string, hasSchema: boolean): Message[] {
+    const baseContext: Message[] = [
+      ...this.history,
       { role: "user", content: input },
-      {
-        role: "system",
-        content:
-          REACT_SYSTEM_PROMPT.replace("{{TOOL_GUIDELINES}}", toolGuidelines)
-            .replace("{{SCHEMA_GUIDELINES}}", schemaGuidelines)
-            .replace("{{SCHEMA_NOTE}}", schemaNote) +
-          (hasTools ? `\n${toolSection}` : "") +
-          (hasSchema ? `\n${this.outputProcessor.generatePrompt(schema)}` : ""),
-      },
+      { 
+        role: "system", 
+        content: REACT_SYSTEM_PROMPT(this.tools.length > 0, hasSchema)
+      }
     ];
+
+    if (this.tools.length > 0) {
+      const toolsContent = `Tools:\n${this.tools.map(t => `${t.name}: ${t.description}`).join("\n")}`;
+      baseContext.push({ role: "system", content: toolsContent });
+    }
+
+    return baseContext;
   }
 
-  // this tries to extract the thought, action, and final answer from the response
-  private parseReactResponse(response: string): {
-    thought?: string;
-    action?: string;
-    finalAnswer?: string;
-  } {
+  private async generateStep(): Promise<ModelResponse> {    
+    return this.agent.provider.generateResponse(this.context);
+  }
+
+  private parseResponse(content: string) {
     return {
-      thought: this.extractSection(response, "Thought"),
-      action: this.extractSection(response, "Action"),
-      finalAnswer: this.extractSection(response, "Final Answer"),
+      thought: this.extractSection(content, "Thought"),
+      action: this.extractSection(content, "Action"),
+      answer: this.extractSection(content, "Final Answer")
     };
   }
 
-  // uses regex to extract a section from the response needed for the previous function
-  private extractSection(
-    response: string,
-    section: string
-  ): string | undefined {
-    const regex = new RegExp(`${section}:\\s*(.*?)(?=\\n\\w+:|$)`, "s");
-    const match = response.match(regex);
-    return match?.[1]?.trim();
-  }
-
-  // uses extractToolCall to find the action (or tools). once you find the arguments, execute the tool. the regex is a bit hacky
   private async executeAction(action: string): Promise<string> {
-    const toolCall = this.agent.extractToolCall({ content: action });
-    if (!toolCall) throw new Error(`Invalid action format: ${action}`);
+    const toolCall = this.parseToolCall(action);
+    
+    if (!toolCall) {
+      throw new Error('Malformed tool call');
+    }
 
-    const tool = this.agent.tools.find((t: Tool) => t.name === toolCall.name);
-    if (!tool) throw new Error(`Tool ${toolCall.name} not registered`);
+    const tool = this.tools.find(t => t.name === toolCall.name);
+    if (!tool) {
+      throw new Error(`Unknown tool: ${toolCall.name}`);
+    }
 
     try {
-      return await tool.execute(toolCall.arguments);
+      const args = tool.parameters.parse(toolCall.args);
+      return await tool.execute(args);
     } catch (error) {
-      return `Tool error: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`;
+      throw new Error(
+        `Tool execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
-  // update the context every time
-  private updateContext(response: string, toolResult: string) {
-    this.currentContext.push(
-      { role: "assistant", content: response },
-      { role: "system", content: `Observation: ${toolResult}` }
+  private parseToolCall(action: string) {
+    const match = action.match(/toolCall:(\w+)\((.+)\)/);
+    if (!match || !match[2]) return null;
+  
+    try {
+      return {
+        name: match[1],
+        args: JSON.parse(
+          match[2]
+            .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3') 
+            .replace(/'/g, '"')
+        )
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  private async validateAnswer(answer: string, schema?: z.ZodSchema): Promise<string> {
+    if (!schema) return answer;
+
+    const cleaned = this.cleanJSON(answer);
+    const validation = await this.validateOutput(cleaned, schema);
+    
+    if (validation.success) {
+      return JSON.stringify((validation as z.SafeParseSuccess<any>).data);
+    }
+
+    this.debugLog(
+      '[Validation Failed]',
+      'Errors:',
+      validation.error.issues.map(e => 
+        `${e.path.join('.')}: ${e.message}`
+      )
     );
+    
+    return this.retryWithSchema(validation.error.issues, schema); 
   }
 
-  // when we receive an error, we want to prompt the user to correct their previous attempt and the error to be fixed
-  private getRetryPrompt(schema: z.ZodSchema, errors?: any[]): string {
-    return [
-      // simply join the errors into a string (maybe need to change?)
-      this.outputProcessor.generatePrompt(schema),
-      "Previous attempt failed due to:",
-      errors?.map((e) => `- ${e.message}`).join("\n") ||
-        "Invalid output format",
-      "Please correct the following issues and try again:",
-    ].join("\n");
+  private retryWithSchema(errors: z.ZodIssue[], schema: z.ZodSchema): string {
+    const errorList = errors.map(e => `- ${e.path.join('.')}: ${e.message}`);
+    const retryMessage = [
+      'Validation failed. Issues:',
+      ...errorList,
+      'Required format:',
+      this.generateSchemaPrompt(schema)
+    ].join('\n');
+
+    this.context.push({ role: "system", content: retryMessage });
+    return "";
   }
 
-
-  private getErrorRetryPrompt(error: unknown, schema?: z.ZodSchema): string {
-    const basePrompt = [
-      "Error occurred during processing:",
-      error instanceof Error ? error.message : "Unknown error",
-      "Please correct your previous attempt.",
-    ].join("\n");
-
-    return schema
-      ? `${this.outputProcessor.generatePrompt(schema)}\n${basePrompt}`
-      : basePrompt;
+  private extractSection(content: string, section: string): string {
+    const regex = new RegExp(`${section}:\\s*([\\s\\S]*?)(?=\\n\\w+:|$)`, "i");
+    return content.match(regex)?.[1]?.trim() || "";
   }
 }

@@ -1,7 +1,7 @@
-import { Base } from "@/agent-core/providers/base-provider";
+import { BaseProvider } from "@/agent-core/providers/base-provider";
 import { Message, ModelResponse, ModelConfig } from "@/agent-core/schema/core-schema";
 
-export class ClaudeProvider extends Base {
+export class ClaudeProvider extends BaseProvider {
   systemPrompt?: string;
 
   constructor(config: ModelConfig) {

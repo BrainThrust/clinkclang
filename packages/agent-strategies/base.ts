@@ -1,75 +1,75 @@
-import { Agent } from "@/agent-core/core";
-import { StructuredOutputProcessor } from "@/agent-core/schema/output-validator";
 import { z } from "zod";
+import { Agent } from "@/agent-core/core";
+import { Message } from "@/agent-core/schema/core-schema";
 
-// abstract framework
 export abstract class BaseStrategy {
-  constructor(
-    protected agent: Agent,
-    protected outputProcessor: StructuredOutputProcessor
-  ) {}
+  constructor(protected agent: Agent) {}
 
-  // execute function
   abstract execute(input: string, schema?: z.ZodSchema): Promise<string>;
 
-  // validate function
-  protected async validateOutput(response: string, schema: z.ZodSchema) {
-    return this.outputProcessor.parse(schema, response, 0);
+  protected cleanJSON(content: string): string {
+    return content
+      .replace(/```json/g, '')
+      .replace(/```/g, '')
+      .replace(/(\w+):/g, '"$1":')
+      .replace(/'/g, '"');
   }
 
-  // get tools
+  protected async validateOutput<T>(content: string, schema: z.ZodSchema<T>) {
+    try {
+      const cleaned = this.cleanJSON(content);
+      const parsed = JSON.parse(cleaned);
+      return schema.safeParse(parsed);
+    } catch (error) {
+      return {
+        success: false,
+        error: new z.ZodError([
+          {
+            code: "invalid_type",
+            expected: "object",
+            received: "string",
+            path: [],
+            message: `Malformed JSON: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }
+        ])
+      };
+    }
+  }
+
+  protected generateSchemaPrompt(schema: z.ZodSchema): string {
+    if (schema instanceof z.ZodObject) {
+      const example = Object.entries(schema.shape).reduce((acc, [key, value]) => {
+        acc[key] = value instanceof z.ZodType ? this.getTypeExample(value) : 'unknown';
+        return acc;
+      }, {} as Record<string, any>);
+      
+      return `Required JSON format:\n${JSON.stringify(example, null, 2)}`;
+    }
+    return `Required format: ${schema.description || 'Valid JSON matching the schema'}`;
+  }
+
+  private getTypeExample(type: z.ZodType): any {
+    if (type instanceof z.ZodString) return "string";
+    if (type instanceof z.ZodNumber) return 0;
+    if (type instanceof z.ZodBoolean) return true;
+    if (type instanceof z.ZodArray) return [this.getTypeExample(type.element)];
+    return "value";
+  }
+
   protected get tools() {
     return this.agent.tools;
   }
 
-  // get history
   protected get history() {
     return this.agent.getHistory();
   }
 
-  // this is a way to process tool output into a JSON which is accessable by every framework
-  protected async processToolOutput(content: string, schema?: z.ZodSchema): Promise<string> {
-    if (!schema) return content;
-
-    // Only process if we have a schema AND it's tool output
-    if (schema && this.isToolOutput(content)) {
-      const schemaPrompt = this.outputProcessor.generatePrompt(schema);
-      
-      const conversionPrompt = [
-        schemaPrompt,
-        "\n\nRAW TOOL OUTPUT TO CONVERT:",
-        "```",
-        content,
-        "```",
-        "STRICTLY FOLLOW THESE STEPS:",
-        "1. Analyze the raw tool output above",
-        "2. Extract relevant data matching the schema",
-        "3. Generate ONLY the JSON object - no commentary",
-        "4. Validate against all schema constraints",
-        "\nFORMATTED JSON:"
-      ].join("\n");
-  
-      if (this.agent.config.structure?.debug) {
-        console.debug("[ToolOutput] Conversion prompt:", conversionPrompt);
-      }
-  
-      const messages = [
-        ...this.history,
-        { role: "user" as const, content: conversionPrompt }
-      ];
-      
-      const response = await this.agent.provider.generateResponse(messages);
-      return response.content;
+  protected isToolOutput(content: string): boolean {
+    try {
+      JSON.parse(content);
+      return false;
+    } catch {
+      return true;
     }
-  
-    return content;
   }
-  
-  private isToolOutput(content: string): boolean {
-    // Only check for tool results if schema exists
-    return !!this.agent.outputSchema && (
-      content.includes("TOOL RESULT") || 
-      !content.startsWith("{")
-    );
-  }
-};
+}

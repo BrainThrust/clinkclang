@@ -1,7 +1,6 @@
-// import { Message, ModelConfig, ModelResponse } from "../schema/core-schema";
 import { Message, ModelConfig, ModelResponse } from "@/agent-core/schema/core-schema";
 
-export abstract class Base {
+export abstract class BaseProvider {
   protected config: ModelConfig;
 
   constructor(config: ModelConfig) {
@@ -12,4 +11,14 @@ export abstract class Base {
     messages: Message[],
     tools?: any[] 
   ): Promise<ModelResponse>;
+}
+
+export interface ProviderConfig {
+  apiKey: string;
+  modelName: string;
+  temperature?: number;
+  maxTokens?: number;
+  version?: string;
+  systemPrompt?: string;
+  stream?: boolean;
 }
