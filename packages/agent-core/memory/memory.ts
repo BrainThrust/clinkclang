@@ -1,12 +1,17 @@
-export abstract class Memory {
-  abstract append(memory: string[]): void;
+import { MemorySection } from "@/agent-core/memory/memory-schema";
 
-  abstract remove(memory: string): void;
-  removeMany(memories: string[]): void {
-    memories.forEach((m) => this.remove(m));
-  }
+export abstract class BaseMemory {
+  abstract addContent(
+    content: string, 
+    type: MemorySection['type'], 
+    priority?: number
+  ): void;
 
-  abstract reset(): void;
+  abstract getContext(priorityThreshold?: number): string;
 
-  abstract retrieve(task: string): void;
+  abstract getMemorySections(): MemorySection[];
+
+  abstract clear(): void;
+
+  abstract getTokenUsage(): number;
 }

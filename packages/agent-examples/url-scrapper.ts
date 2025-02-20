@@ -19,7 +19,7 @@ const analysisAgent = new Agent({
   provider: {
     type: "openai",
     apiKey: OPENAI_API_KEY,
-    modelName: "gpt-4", 
+    modelName: "gpt-4", // need a model that can handle long contexts
     temperature: 0.3,
     maxTokens: 1200
   },
@@ -32,8 +32,9 @@ const analysisAgent = new Agent({
   strategy: "react",
   structure: {
     strict: true,
-    maxRetries: 4, // need to add this to the config to customize
-    debug: true
+    maxRetries: 'unlimited', // set to 'unlimited' to allow retries till an answer is found
+    debug: true,
+    maxContextTokens: 10000 // this needs to be high based on the content length
   }
 });
 
@@ -57,5 +58,8 @@ async function main() {
 }
 
 if (require.main === module) {
-  main().catch(console.error);
+  main().then(() => {
+    console.log("Done!");
+    process.exit(0);
+  }).catch(console.error);
 }

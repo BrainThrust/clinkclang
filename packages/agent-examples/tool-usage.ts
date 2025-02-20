@@ -54,7 +54,7 @@ const agent = new Agent({
 async function testCalculation() {
   try {
     const response = await agent.generate(
-      "What is 228 multiplied by 298? First calculate then answer."
+      "What is 2228 multiplied by 278? First calculate then answer."
     );
     
     console.log("\nCalculation Result:");

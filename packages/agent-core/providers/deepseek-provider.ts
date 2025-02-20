@@ -10,7 +10,7 @@ export class DeepSeekProvider extends BaseProvider {
       super(config);
     }
   
-    async generate(messages: Message[]): Promise<ModelResponse> {
+    async generateResponse(messages: Message[]): Promise<ModelResponse> {
       try {
         const headers = {
           "Content-Type": "application/json",

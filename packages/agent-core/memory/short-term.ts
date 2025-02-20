@@ -1,55 +1,69 @@
-import { Message } from "@/agent-core/schema/core-schema";
+import { MemorySection } from '@/agent-core/memory/memory-schema';
+import { BaseMemory } from '@/agent-core/memory/memory';
 
-export class ShortTermMemory {
-  private messages: Message[];
+function defaultTokenizer(text: string): number {
+  return Math.ceil(text.length / 4);
+}
+
+export class ShortTermMemory extends BaseMemory {
+  private memory: MemorySection[] = [];
   private maxTokens: number;
-  private currentTokens: number;
+  private currentTokens = 0;
+  private tokenizer: (text: string) => number;
 
-  constructor(initialMessages: Message[] = [], maxContextTokens = 1000) {
-    this.messages = [];
-    this.maxTokens = maxContextTokens;
-    this.currentTokens = 0;
-    initialMessages.forEach(msg => this.addMessage(msg));
+
+  constructor(
+    maxTokens = 4000,
+    tokenizer: (text: string) => number = defaultTokenizer
+  ) {
+    super();
+    this.maxTokens = maxTokens;
+    this.tokenizer = tokenizer;
   }
 
-  addMessage(message: Message): void {
-    const messageTokens = this.estimateTokens(message.content);
-    
-    // remove the oldest messages until we have enough space
-    while (this.currentTokens + messageTokens > this.maxTokens) {
-      const removed = this.messages.shift();
-      if (removed) {
-        this.currentTokens -= this.estimateTokens(removed.content);
-      } else {
-        break; // this is to prevent an infinite loop if the memory is full
+
+  addContent(content: string, type: MemorySection['type'], priority = 0) {
+    const tokens = this.tokenizer(content);
+
+    const newEntry: MemorySection = {
+      priority,
+      tokens,
+      content,
+      type
+    };
+
+    this.memory.push(newEntry);
+    this.currentTokens += tokens;
+    while (this.currentTokens > this.maxTokens && this.memory.length > 1) {
+      const lowestPriority = Math.min(...this.memory.map(m => m.priority));
+      const evictIndex = this.memory.findIndex(m => m.priority === lowestPriority);
+
+      if (evictIndex === -1) break;
+
+      const [evicted] = this.memory.splice(evictIndex, 1);
+      if (evicted) {
+        this.currentTokens -= evicted.tokens;
       }
     }
-    
-    // Add new message
-    this.messages.push(message);
-    this.currentTokens += messageTokens;
   }
 
-  getMessages(): Message[] {
-    return [...this.messages];
+  getContext(priorityThreshold = 0): string {
+    const relevant = this.memory.filter(m => m.priority >= priorityThreshold);
+    relevant.sort((a, b) => b.priority - a.priority);
+
+    return relevant.map(m => m.content).join('\n\n');
+  }
+
+  getMemorySections(): MemorySection[] {
+    return [...this.memory];
   }
 
   clear(): void {
-    this.messages = [];
+    this.memory = [];
     this.currentTokens = 0;
   }
 
-  getCurrentTokenCount(): number {
+  getTokenUsage(): number {
     return this.currentTokens;
-  }
-
-  private estimateTokens(text: string): number {
-    // 1 token ≈ 4 characters (conservative estimate)
-    return Math.ceil(text.length / 4);
-  }
-
-  printMemoryStatus(): void {
-    console.log(`Memory usage: ${this.currentTokens}/${this.maxTokens} tokens`);
-    console.log(`Stored messages: ${this.messages.length}`);
   }
 }
