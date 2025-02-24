@@ -17,7 +17,6 @@ export class DeepSeekProvider extends BaseProvider {
           Authorization: `Bearer ${this.config.apiKey}`,
         };
         
-        // added parameters (need to check impleme  ntation)
         const body = JSON.stringify({
           model: this.config.modelName,
           messages: messages,

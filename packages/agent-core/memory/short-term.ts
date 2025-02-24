@@ -1,69 +1,112 @@
-import { MemorySection } from '@/agent-core/memory/memory-schema';
-import { BaseMemory } from '@/agent-core/memory/memory';
+import { BaseMemory } from './memory';
+import { MemoryMessage, MemorySummary } from '@/agent-core/schema/memory-schema';
+import { BaseProvider } from '@/agent-core/providers/base-provider';
 
-function defaultTokenizer(text: string): number {
-  return Math.ceil(text.length / 4);
-}
+const DEFAULT_SUMMARIZE_PROMPT = `Condense this conversation history while preserving key details, 
+relationships between questions and answers, and technical specifics. Include important numbers, 
+names, and concepts:`;
 
 export class ShortTermMemory extends BaseMemory {
-  private memory: MemorySection[] = [];
-  private maxTokens: number;
-  private currentTokens = 0;
-  private tokenizer: (text: string) => number;
+	private messages: MemoryMessage[] = [];
+	private summaries: MemorySummary[] = [];
+	private tokenLimit: number;
+	private provider: BaseProvider;
 
+	constructor(config: {
+		provider: BaseProvider;
+		tokenLimit?: number;
+		initialMessages?: MemoryMessage[];
+	}) {
+		super();
+		this.provider = config.provider;
+		this.tokenLimit = config.tokenLimit || 4000;
+		this.messages = config.initialMessages || [];
+	}
 
-  constructor(
-    maxTokens = 4000,
-    tokenizer: (text: string) => number = defaultTokenizer
-  ) {
-    super();
-    this.maxTokens = maxTokens;
-    this.tokenizer = tokenizer;
-  }
+	async addMessage(message: Omit<MemoryMessage, 'tokens' | 'createdAt'>): Promise<void> {
+		const newMessage = this.createMessage(message.role, message.content, message.metadata);
+		this.messages.push(newMessage);
+		await this.manageMemory();
+	}
 
+	private async manageMemory(): Promise<void> {
+		while (this.getTokenUsage() > this.tokenLimit) {
+			const { toKeep, toSummarize } = this.splitMessages();
 
-  addContent(content: string, type: MemorySection['type'], priority = 0) {
-    const tokens = this.tokenizer(content);
+			if (toSummarize.length === 0) break;
 
-    const newEntry: MemorySection = {
-      priority,
-      tokens,
-      content,
-      type
-    };
+			const summary = await this.createSummary(toSummarize);
+			this.summaries.push(summary);
 
-    this.memory.push(newEntry);
-    this.currentTokens += tokens;
-    while (this.currentTokens > this.maxTokens && this.memory.length > 1) {
-      const lowestPriority = Math.min(...this.memory.map(m => m.priority));
-      const evictIndex = this.memory.findIndex(m => m.priority === lowestPriority);
+			const message = this.createMessage('system', summary.content, {
+				originalTokens: summary.originalTokens,
+				summaryDate: summary.summaryDate
+			});
+			this.messages = [...[message], ...toKeep];
+		}
+	}
 
-      if (evictIndex === -1) break;
+	private splitMessages(): { toKeep: MemoryMessage[]; toSummarize: MemoryMessage[] } {
+		let tokenCount = 0;
+		const toKeep: MemoryMessage[] = [];
+		const toSummarize: MemoryMessage[] = [];
 
-      const [evicted] = this.memory.splice(evictIndex, 1);
-      if (evicted) {
-        this.currentTokens -= evicted.tokens;
-      }
-    }
-  }
+		for (let i = this.messages.length - 1; i >= 0; i--) {
+			const msg = this.messages[i];
 
-  getContext(priorityThreshold = 0): string {
-    const relevant = this.memory.filter(m => m.priority >= priorityThreshold);
-    relevant.sort((a, b) => b.priority - a.priority);
+			if (msg) {
+				if (tokenCount + msg.tokens <= this.tokenLimit * 0.8) {
+					// leave 20% buffer
+					toKeep.unshift(msg);
+					tokenCount += msg.tokens;
+				} else {
+					toSummarize.push(msg);
+				}
+			}
+		}
+		return { toKeep, toSummarize };
+	}
 
-    return relevant.map(m => m.content).join('\n\n');
-  }
+	private async createSummary(messages: MemoryMessage[]): Promise<MemorySummary> {
+		const conversation = messages
+			.map((m) => `${m.role.toUpperCase()} (${new Date(m.createdAt).toISOString()}): ${m.content}`)
+			.join('\n\n');
 
-  getMemorySections(): MemorySection[] {
-    return [...this.memory];
-  }
+		const prompt = `${DEFAULT_SUMMARIZE_PROMPT}\n\n${conversation}`;
+		const summaryPromptMessage: MemoryMessage = {
+			role: 'system',
+			content: prompt,
+			tokens: this.calculateTokens(prompt),
+			createdAt: Date.now()
+		  };
+		
+		  const response = await this.provider.generateResponse([summaryPromptMessage]);
+		
+		  return {
+			content: response.content,
+			originalTokens: messages.reduce((acc, m) => acc + m.tokens, 0),
+			summarizedTokens: this.calculateTokens(response.content),
+			summaryDate: Date.now()
+		  };
+	}
 
-  clear(): void {
-    this.memory = [];
-    this.currentTokens = 0;
-  }
+	getMessages(): MemoryMessage[] {
+		return [...this.messages];
+	}
 
-  getTokenUsage(): number {
-    return this.currentTokens;
-  }
+	getSummaries(): MemorySummary[] {
+		return [...this.summaries];
+	}
+
+	getTokenUsage(): number {
+		return (
+			this.messages.reduce((acc, m) => acc + m.tokens, 0) +
+			this.summaries.reduce((acc, s) => acc + s.summarizedTokens, 0)
+		);
+	}
+
+	clear(): void {
+		this.messages = [];
+		this.summaries = [];
+	}
 }
