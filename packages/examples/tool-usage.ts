@@ -1,6 +1,6 @@
-import { ReactAgent } from '@/agent-core/agents/react';
+import { ReactAgent } from 'packages/core/agents/react';
 import { z } from 'zod';
-import { Tool } from '@/agent-core/tools/tool';
+import { Tool } from 'packages/core/tools/tool';
 
 const OPENAI_API_KEY = 'openai_api_key';
 

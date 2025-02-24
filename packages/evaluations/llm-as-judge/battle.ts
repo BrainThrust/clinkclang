@@ -1,4 +1,4 @@
-import { Agent } from "@/agent-core/agents/core";
+import { Agent } from "@/agent-core/agents/base";
 import { Battle } from "autoevals";
 
 // this one is unique. this is a test to determine whether an output _better_ performs the `instructions` than the original (expected) value

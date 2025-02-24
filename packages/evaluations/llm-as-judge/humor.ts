@@ -1,4 +1,4 @@
-import { Agent } from "@/agent-core/agents/core";
+import { Agent } from "@/agent-core/agents/base";
 import { Humor } from "autoevals";
 
 // check if output is funny

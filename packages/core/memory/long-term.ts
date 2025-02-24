@@ -1,9 +1,9 @@
 // TODO: complete the implementation of long-term memory
-import { BaseMemory } from "@/agent-core/memory/memory";
-import { MemorySection } from "@/agent-core/schema/memory-schema";
+import { BaseMemory } from "packages/core/memory/memory";
+import { MemorySection } from "packages/core/schema/memory-schema";
 import { getEmbeddingsOpenAI } from "packages/functions/memory/get-embeddings-openai";
 import { memoryTable } from "./db/schema";
-import { OpenAIEmbedding } from "@/agent-core/schema/memory-shcema";
+import { OpenAIEmbedding } from "packages/core/schema/memory-shcema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, l2Distance } from "drizzle-orm";
 import { config } from "dotenv";

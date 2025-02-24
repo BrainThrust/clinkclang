@@ -1,4 +1,4 @@
-import { MemoryMessage, MemorySummary } from '@/agent-core/schema/memory-schema';
+import { MemoryMessage, MemorySummary } from 'packages/core/schema/memory-schema';
 
 export abstract class BaseMemory {
   abstract addMessage(message: MemoryMessage): Promise<void>;

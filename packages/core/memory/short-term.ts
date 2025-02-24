@@ -1,6 +1,6 @@
-import { BaseMemory } from './memory';
-import { MemoryMessage, MemorySummary } from '@/agent-core/schema/memory-schema';
-import { BaseProvider } from '@/agent-core/providers/base-provider';
+import { BaseMemory } from 'packages/core/memory/memory';
+import { MemoryMessage, MemorySummary } from 'packages/core/schema/memory-schema';
+import { BaseProvider } from 'packages/core/providers/base-provider';
 
 const DEFAULT_SUMMARIZE_PROMPT = `Condense this conversation history while preserving key details, 
 relationships between questions and answers, and technical specifics. Include important numbers, 
@@ -42,6 +42,7 @@ export class ShortTermMemory extends BaseMemory {
 				originalTokens: summary.originalTokens,
 				summaryDate: summary.summaryDate
 			});
+
 			this.messages = [...[message], ...toKeep];
 		}
 	}
@@ -64,6 +65,7 @@ export class ShortTermMemory extends BaseMemory {
 				}
 			}
 		}
+
 		return { toKeep, toSummarize };
 	}
 
@@ -73,21 +75,19 @@ export class ShortTermMemory extends BaseMemory {
 			.join('\n\n');
 
 		const prompt = `${DEFAULT_SUMMARIZE_PROMPT}\n\n${conversation}`;
-		const summaryPromptMessage: MemoryMessage = {
-			role: 'system',
-			content: prompt,
-			tokens: this.calculateTokens(prompt),
-			createdAt: Date.now()
-		  };
-		
-		  const response = await this.provider.generateResponse([summaryPromptMessage]);
-		
-		  return {
+		const response = await this.provider.generateResponse([
+			{
+				role: 'system',
+				content: prompt
+			}
+		]);
+
+		return {
 			content: response.content,
 			originalTokens: messages.reduce((acc, m) => acc + m.tokens, 0),
 			summarizedTokens: this.calculateTokens(response.content),
 			summaryDate: Date.now()
-		  };
+		};
 	}
 
 	getMessages(): MemoryMessage[] {

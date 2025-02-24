@@ -1,9 +1,9 @@
-import { BaseProvider } from "@/agent-core/providers/base-provider";
+import { BaseProvider } from "packages/core/providers/base-provider";
 import {
   Message,
   ModelResponse,
   ModelConfig,
-} from "@/agent-core/schema/core-schema";
+} from "packages/core/schema/core-schema";
 
 export class DeepSeekProvider extends BaseProvider {
     constructor(config: ModelConfig) {

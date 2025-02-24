@@ -1,4 +1,4 @@
-import { Tool } from "@/agent-core/tools/tool";
+import { Tool } from "packages/core/tools/tool";
 import { z } from "zod";
 import * as puppeteer from 'puppeteer';
 

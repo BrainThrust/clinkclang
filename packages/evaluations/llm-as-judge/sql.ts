@@ -1,4 +1,4 @@
-import { Agent } from "@/agent-core/agents/core";
+import { Agent } from "@/agent-core/agents/base";
 import { Sql } from "autoevals";
 
 // The idea is to test whether an SQL query is semantically the same as a reference (output) query.

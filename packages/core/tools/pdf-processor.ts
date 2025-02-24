@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Tool } from "@/agent-core/tools/tool";
+import { Tool } from "packages/core/tools/tool";
 import pdf from "pdf-parse";
 import { readFile } from "fs/promises";
 import path from "path";

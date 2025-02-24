@@ -4,7 +4,7 @@ import {
   OpenAIEmbeddingResponse,
   OpenAIEmbedding,
   OpenAIEmbeddingSchema,
-} from "@/agent-core/schema/memory-shcema";
+} from "packages/core/schema/memory-shcema";
 config({ path: __dirname + "./../../../.env" });
 
 const ENDPOINT_URI = "https://api.openai.com/v1/embeddings";

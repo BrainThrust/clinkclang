@@ -1,4 +1,4 @@
-import { Agent } from "@/agent-core/agents/core";
+import { Agent } from "@/agent-core/agents/base";
 import { Translation } from "autoevals";
 
 // this is a test to determine whether an `output` is as good of a translation of the `input` in the specified `language` as an expert

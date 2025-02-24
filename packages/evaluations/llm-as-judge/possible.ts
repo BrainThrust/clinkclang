@@ -1,4 +1,4 @@
-import { Agent } from "@/agent-core/agents/core";
+import { Agent } from "@/agent-core/agents/base";
 import { Possible } from "autoevals";
 
 // this is a test to check whether an output is a possible solution to the challenge posed in the input

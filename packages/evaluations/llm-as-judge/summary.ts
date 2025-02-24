@@ -1,4 +1,4 @@
-import { Agent } from "@/agent-core/agents/core";
+import { Agent } from "@/agent-core/agents/base";
 import { Summary } from "autoevals";
 
 const OPENAI_API_KEY = "openai_api_key";

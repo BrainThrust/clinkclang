@@ -1,4 +1,4 @@
-import { Agent } from "@/agent-core/agents/core";
+import { Agent } from "@/agent-core/agents/base";
 import { Factuality } from "autoevals";
 
 // this is a test to determine whether an output is factual, compared to an original (`expected`) value
