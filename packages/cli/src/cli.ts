@@ -1,9 +1,15 @@
+// src/cli.ts
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
 import prompts from 'prompts';
 import degit from 'degit';
-import { DegitOptions, remoteComponentMapping } from '../src/config.js';
+import {
+	DegitOptions,
+	RemoteComponent,
+	remoteComponentMapping,
+	getComponentBranch
+} from '../src/config.js';
 
 /**
  * Initializes a new project.
@@ -70,7 +76,40 @@ export async function initProject(name?: string) {
 export async function addComponent(component: string) {
 	console.log(chalk.green(`Adding component "${component}" to your ClinkClang project...`));
 
-	// Check for clinkclang.json
+	// Validate the project and get configuration
+	const config = validateClinkClangProject();
+
+	// Get the component information
+	const lowerCaseComponent = component.toLowerCase();
+	const remoteComponent = getRemoteComponent(lowerCaseComponent);
+
+	if (!remoteComponent || !remoteComponent.url) {
+		console.error(chalk.red('Component URL is missing'));
+		process.exit(1);
+	}
+
+	// Set up target directory based on config
+	const libraryDir = config.libraryDir || 'lib';
+	const targetDir = path.resolve(process.cwd(), libraryDir, 'ai');
+	fs.mkdirSync(targetDir, { recursive: true });
+
+	try {
+		if (remoteComponent.type === 'component') {
+			await addUIComponent(remoteComponent, targetDir);
+		} else {
+			await addLogicComponent(remoteComponent, targetDir, component);
+		}
+	} catch (error) {
+		console.error(chalk.red(`Failed to add component "${component}" from remote repository.`));
+		console.error(chalk.red(String(error)));
+		process.exit(1);
+	}
+}
+
+/**
+ * Validates that we're in a ClinkClang project and returns the configuration
+ */
+function validateClinkClangProject() {
 	const clinkclangConfigPath = path.resolve(process.cwd(), 'clinkclang.json');
 	if (!fs.existsSync(clinkclangConfigPath)) {
 		console.error(
@@ -78,48 +117,74 @@ export async function addComponent(component: string) {
 				'Not a ClinkClang project (or any of the parent directories): clinkclang.json not found.'
 			)
 		);
-		process.exit(1);
+		throw new Error('clinkclang.json not found');
 	}
 
-	const lowerCaseComponent = component.toLowerCase();
-	const remoteComponent = remoteComponentMapping[lowerCaseComponent];
+	return JSON.parse(fs.readFileSync(clinkclangConfigPath, 'utf8'));
+}
+
+/**
+ * Gets the remote component details
+ */
+function getRemoteComponent(componentName: string): RemoteComponent {
+	const remoteComponent = remoteComponentMapping[componentName];
 
 	if (!remoteComponent) {
-		console.error(chalk.red(`Component "${component}" is not recognized.`));
+		console.error(chalk.red(`Component "${componentName}" is not recognized.`));
 		process.exit(1);
 	}
 
-	// Construct the degit path, handling subdirectory components.
-	const degitPath = remoteComponent.url;
+	return remoteComponent;
+}
 
-	// Read clinkclang.json to get the library directory
-	const clinkclangConfig = JSON.parse(fs.readFileSync(clinkclangConfigPath, 'utf8'));
-	const libraryDir = clinkclangConfig.libraryDir;
-
-	// Construct the target directory based on component type.
-	const targetDir = path.resolve(process.cwd(), libraryDir, 'ai', lowerCaseComponent);
-
+/**
+ * Adds a UI component to the project
+ */
+async function addUIComponent(remoteComponent: RemoteComponent, targetDir: string) {
 	const degitOptions: DegitOptions = {
 		cache: false,
 		force: true,
-		verbose: true,
-		// strip 2 levels for logic and strip 7 levels for components
-		...(remoteComponent.type === 'logic' && {
-			strip: 2
-		}),
-		...(remoteComponent.type === 'component' && {
-			strip: 7
-		})
+		verbose: true
 	};
 
-	const emitter = degit(degitPath, degitOptions);
+	const branch = getComponentBranch(remoteComponent);
+	const fullUrl = `${remoteComponent.url}#${branch}`;
+	const componentDir = path.resolve(targetDir, remoteComponent.path);
 
-	try {
-		await emitter.clone(targetDir);
-		console.log(chalk.green(`Component "${component}" added successfully at ${targetDir}.`));
-	} catch (error) {
-		console.error(chalk.red(`Failed to add component "${component}" from remote repository.`));
-		console.error(chalk.red(String(error))); // More specific error
-		process.exit(1);
-	}
+	// Create the directory structure
+	fs.mkdirSync(path.dirname(componentDir), { recursive: true });
+
+	// Clone directly to the target directory
+	const emitter = degit(fullUrl, degitOptions);
+	await emitter.clone(componentDir);
+
+	console.log(chalk.green(`UI Component added successfully at ${componentDir}`));
+}
+
+/**
+ * Adds a logic component to the project
+ */
+async function addLogicComponent(
+	remoteComponent: RemoteComponent,
+	targetDir: string,
+	componentName: string
+) {
+	const degitOptions: DegitOptions = {
+		cache: false,
+		force: true,
+		verbose: true
+	};
+
+	const branch = getComponentBranch(remoteComponent);
+	const fullUrl = `${remoteComponent.url}#${branch}`;
+	const packageDir = path.resolve(targetDir, remoteComponent.path);
+
+	// Create the directory structure
+	fs.mkdirSync(path.dirname(packageDir), { recursive: true });
+
+	// Clone directly to the target directory
+	const emitter = degit(fullUrl, degitOptions);
+	await emitter.clone(packageDir);
+
+	console.log(chalk.green(`Logic Component added successfully at ${packageDir}`));
 }
