@@ -10,13 +10,11 @@ pnpm dlx clinkclang@latest init
 
 # Add clinkclang's packages
 pnpm dlx clinkclang@latest add agent-core
-pnpm dlx clinkclang@latest add agent-evals
+pnpm dlx clinkclang@latest add agent-evals-llm-as-judge
 pnpm dlx clinkclang@latest add agent-examples
 pnpm dlx clinkclang@latest add agent-functions
-pnpm dlx clinkclang@latest add agent-strategies
-pnpm dlx clinkclang@latest add agent-tools
-pnpm dlx clinkclang@latest add agent-workflows
-pnpm dlx clinkclang@latest add tracker
+pnpm dlx clinkclang@latest add workflows
+pnpm dlx clinkclang@latest add workflows-examples
 
 # Show version
 pnpm dlx clinkclang@latest version

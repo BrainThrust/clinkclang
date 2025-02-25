@@ -6,39 +6,27 @@ export interface RemoteComponent {
 }
 export const remoteComponentMapping: Record<string, RemoteComponent> = {
 	'agent-core': {
-		url: 'github:BrainThrust/clinkclang/packages/agent-core#dev-0.01',
+		url: 'github:BrainThrust/clinkclang/packages/core#dev-0.01',
 		type: 'logic'
 	},
-	'agent-evals': {
-		url: 'github:BrainThrust/clinkclang/packages/agent-evals#dev-0.01',
+	'agent-evals-llm-as-judge': {
+		url: 'github:BrainThrust/clinkclang/packages/evaluations/llm-as-judge#dev-0.01',
 		type: 'logic'
 	},
 	'agent-examples': {
-		url: 'github:BrainThrust/clinkclang/packages/agent-examples#dev-0.01',
+		url: 'github:BrainThrust/clinkclang/packages/examples#dev-0.01',
 		type: 'logic'
 	},
 	'agent-functions': {
-		url: 'github:BrainThrust/clinkclang/packages/agent-functions#dev-0.01',
+		url: 'github:BrainThrust/clinkclang/packages/functions#dev-0.01',
 		type: 'logic'
 	},
-	'agent-strategies': {
-		url: 'github:BrainThrust/clinkclang/packages/agent-strategies#dev-0.01',
+	'workflows': {
+		url: 'github:BrainThrust/clinkclang/packages/workflows#dev-0.01',
 		type: 'logic'
 	},
-	'agent-tools': {
-		url: 'github:BrainThrust/clinkclang/packages/agent-tools#dev-0.01',
-		type: 'logic'
-	},
-	'agent-workflows': {
-		url: 'github:BrainThrust/clinkclang/packages/agent-workflows#dev-0.01',
-		type: 'logic'
-	},
-	workflow: {
-		url: 'github:BrainThrust/clinkclang/packages/workflow#dev-0.01',
-		type: 'logic'
-	},
-	'workflow-examples': {
-		url: 'github:BrainThrust/clinkclang/packages/workflow-examples#dev-0.01',
+	'workflows-examples': {
+		url: 'github:BrainThrust/clinkclang/packages/workflows-examples#dev-0.01',
 		type: 'logic'
 	},
 	tracker: {

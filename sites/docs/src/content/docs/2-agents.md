@@ -142,4 +142,7 @@ const agent = new Agent({
 const response = await agent.generate("What's the weather like?");
 ```
 
-For more examples, check the `packages/agent-examples` directory.
+For more examples, check the `packages/examples` directory.
+```bash
+pnpm dlx clinkclang@latest add agent-examples
+```

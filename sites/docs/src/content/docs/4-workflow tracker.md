@@ -10,10 +10,10 @@ The Workflow Tracker is a module designed to help build and track your workflows
 ## Installation
 ```bash
 # Add the workflow package
-pnpm run dev -- add workflow
+pnpm dlx clinkclang@latest add workflows
 
 # Add the workflow-examples package
-pnpm run dev -- add workflow-examples
+pnpm dlx clinkclang@latest add workflows-examples
 ```
 
 ## Creating your workflow

@@ -1,6 +1,6 @@
-import { Step } from '../workflow/step';
-import { ExecutionStatus } from '../workflow/types';
-import { Workflow } from '../workflow/workflow';
+import { Step } from '../workflows/step';
+import { ExecutionStatus } from '../workflows/types';
+import { Workflow } from '../workflows/workflow';
 import { z } from 'zod';
 
 const testWorkflow = new Workflow({

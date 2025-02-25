@@ -11,13 +11,12 @@
       "noUncheckedIndexedAccess": true,
       "baseUrl": ".",
       "paths": {
-        "@/agent-core/*": ["packages/agent-core/*"],
-        "@/agent-evals/*": ["packages/agent-evals/*"],
-        "@/agent-examples/*": ["packages/agent-examples/*"],
-        "@/agent-functions/*": ["packages/agent-functions/*"],
-        "@/agent-strategies/*": ["packages/agent-strategies/*"],
-        "@/agent-tools/*": ["packages/agent-tools/*"],
-        "@/agent-workflows/*": ["packages/agent-workflows/*"],
+        "@/core/*": ["packages/core/*"],
+        "@/evaluations/*": ["packages/evaluations/*"],
+        "@/examples/*": ["packages/examples/*"],
+        "@/functions/*": ["packages/functions/*"],
+        "@/workflows/*": ["packages/workflows/*"],
+        "@/workflows-examples/*": ["packages/workflows-examples/*"],
         "@/cli/*": ["packages/cli/*"]
       },
     }

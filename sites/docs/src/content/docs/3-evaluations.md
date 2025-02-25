@@ -31,7 +31,7 @@ const result = await Battle({
 });
 ```
 
-More examples for each evaluator can be found in the `packages/agent-evals` folder.
+More examples for each evaluator can be found in the `packages/evaluations` folder.
 
 ### Best Practices
 
