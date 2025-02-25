@@ -1,12 +1,12 @@
 import { z } from 'zod';
-import { BaseProvider } from 'packages/core/providers/base-provider';
-import { OpenAIProvider } from 'packages/core/providers/openai-provider';
-import { ClaudeProvider } from 'packages/core/providers/claude-provider';
-import { DeepSeekProvider } from 'packages/core/providers/deepseek-provider';
-import { Message, ModelResponse, Schema } from 'packages/core/schema/core-schema';
-import { Tool } from 'packages/core/tools/tool';
-import { ShortTermMemory } from 'packages/core/memory/short-term';
-import { MemoryMessage } from 'packages/core/schema/memory-schema';
+import { BaseProvider } from '../providers/base-provider';
+import { OpenAIProvider } from '../providers/openai-provider';
+import { ClaudeProvider } from '../providers/claude-provider';
+import { DeepSeekProvider } from '../providers/deepseek-provider';
+import { Message, ModelResponse, Schema } from '../schema/core-schema';
+import { Tool } from '../tools/tool';
+import { ShortTermMemory } from '../memory/short-term';
+import { MemoryMessage } from '../schema/memory-schema';
 
 type ProviderConfig = OpenAIProviderConfig | ClaudeProviderConfig | DeepSeekProviderConfig;
 

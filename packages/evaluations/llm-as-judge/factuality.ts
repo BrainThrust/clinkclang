@@ -1,11 +1,17 @@
-import { Agent } from "@/agent-core/agents/base";
+import { ReactAgent } from "../../core/agents/react";
 import { Factuality } from "autoevals";
 
 // this is a test to determine whether an output is factual, compared to an original (`expected`) value
-const OPENAI_API_KEY = "openai_api_key";
+const OPENAI_API_KEY = 'openai_api_key';
 
 async function runFactualityTest() {
-    const agent = new Agent({ providerName: "openai", apiKey: OPENAI_API_KEY, modelName: "gpt-4o" });
+    const agent = new ReactAgent({
+        provider: {
+            type: "openai",
+            apiKey: OPENAI_API_KEY,
+            modelName: "gpt-3.5-turbo",
+        }
+    })
     const input = "What is the capital of India?";
     const output = await agent.generate(input);
     const expected = "New Delhi";

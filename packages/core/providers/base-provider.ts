@@ -1,4 +1,4 @@
-import { Message, ModelConfig, ModelResponse } from "packages/core/schema/core-schema";
+import { Message, ModelConfig, ModelResponse } from "../schema/core-schema";
 
 export abstract class BaseProvider {
   protected config: ModelConfig;

@@ -1,0 +1,65 @@
+---
+layout: docs
+title: Installation
+date: '2025-02-16'
+description: 'Installation Docs'
+---
+
+<script lang="ts">
+	import * as Tabs from '$lib/components/ui/tabs';
+
+	const supportedFrameworks = ['sveltekit', 'nextjs', 'nuxt'];
+</script>
+
+We support multiple frameworks, including SvelteKit, Next.js (Coming Soon) and Nuxt (Coming Soon)
+
+<Tabs.Root value="sveltekit">
+	<Tabs.List>
+		<Tabs.Trigger value="sveltekit">SvelteKit</Tabs.Trigger>
+		<Tabs.Trigger value="nextjs">Next.js</Tabs.Trigger>
+		<Tabs.Trigger value="nuxt">Nuxt</Tabs.Trigger>
+	</Tabs.List>
+	{#each supportedFrameworks as framework}
+		<Tabs.Content value={framework}>
+			{#if framework === 'sveltekit'}
+
+            ## SvelteKit
+            Install [shadcn-svelte](https://next.shadcn-svelte.com/docs/installation/sveltekit), refer to the docs for more information.
+```bash
+# Use the sveltekit CLI to create a new project
+pnpm dlx sv@0.6.18 create my-app
+
+# Add tailwind css
+pnpm dlx sv@0.6.18 add tailwindcss
+
+# Install shadcn-svelte
+pnpm i
+
+# Run the shadcn-svelte CLI to install
+pnpm dlx shadcn-svelte@next init
+
+# Initialize clinkclang
+pnpm dlx clinkclang@latest init
+```
+
+Then, install the Tracker component.
+
+```bash
+pnpm dlx clinkclang@latest add tracker
+```
+
+			{:else if framework === 'nextjs'}
+
+            coming soon !
+			
+            {:else if framework === 'nuxt'}
+            
+            coming soon !
+			
+            {/if}
+		</Tabs.Content>
+	{/each}
+</Tabs.Root>
+
+
+

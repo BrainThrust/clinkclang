@@ -1,10 +1,9 @@
 ---
-layout: githubMarkdownLight
+layout: docs
 title: Introduction
 date: '2025-01-27'
 description: 'Introduction to the Agent Docs'
 ---
-# Introduction
 
 ClinkClang is an open-source TypeScript framework for building AI agent workflows with a focus on the developer's experience and enterprise scalability.
 

@@ -1,4 +1,4 @@
-import { Tool } from "packages/core/tools/tool";
+import { Tool } from "./tool";
 import { z } from "zod";
 import * as puppeteer from 'puppeteer';
 

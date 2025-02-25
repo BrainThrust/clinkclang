@@ -1,16 +1,18 @@
-import { Agent } from "@/agent-core/agents/base";
+import { ReactAgent } from "../../core/agents/react";
 import { Possible } from "autoevals";
 
 // this is a test to check whether an output is a possible solution to the challenge posed in the input
-const OPENAI_API_KEY = "openai_api_key";
+const OPENAI_API_KEY = 'openai_api_key';
 
 async function runPossibleTest() {
     try {
-      const agent = new Agent({
-        providerName: "openai",
-        modelName: "gpt-4o",
-        apiKey: OPENAI_API_KEY,
-      });
+      const agent = new ReactAgent({
+        provider: {
+          type: "openai",
+          apiKey: OPENAI_API_KEY,
+          modelName: "gpt-3.5-turbo",
+        },
+      })
   
       const challenge = "Solve the equation 2x + 3 = 7";
       const output = await agent.generate(challenge);

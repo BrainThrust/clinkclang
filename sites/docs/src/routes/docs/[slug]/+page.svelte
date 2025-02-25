@@ -5,6 +5,4 @@
 	export let data: PageData & { component: typeof SvelteComponent };
 </script>
 
-<div class="container mx-auto py-8">
-	<svelte:component this={data.component} docs={data.docs} />
-</div>
+<svelte:component this={data.component} docs={data.docs} />

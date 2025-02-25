@@ -2,10 +2,8 @@
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"hello_world": "Hello, {name} from zh-cn!",
 	"language": "简体中文",
-	"link_1": ">//功能",
-	"link_2": ">//终端",
-	"link_3": ">//联系",
-	"link_4": ">//文档",
+	"link_1": ">//终端",
+	"link_2": ">//文档",
 	"init_button": "初始化",
 	"system_status": "系统状态: 在线",
 
@@ -16,26 +14,11 @@
 
 	"start_sequence": "开始序列",
 	"view_docs": "查看文档",
-	"about_title": "用 AI 颠覆行业",
-	"about_description": "我们的使命是让下一代行业用上 AI 框架，这个框架既强大又易于使用。",
-
-	"features_title": "核心系统概述",
-	"features_description": "终端访问已授予。显示主要系统功能。",
-	"features_card_1_title": "工作流引擎",
-	"features_card_1_description": "创建和管理复杂工作流",
-	"features_card_2_title": "推理引擎",
-	"features_card_2_description": "高级推理能力",
-	"features_card_3_title": "组件库",
-	"features_card_3_description": "任何任务的插件和流程",
-
-	"code_example_title": "代码协议",
-	"code_example_description": "分类实现示例",
 
 	"footer_subtitle": "AI 操作系统 v0.01",
 
 	"footer_system": "系统",
-	"footer_system_1": "> 功能",
-	"footer_system_2": "> 文档",
+	"footer_system_1": "> 文档",
 
 	"footer_network": "网络",
 	"footer_network_1": "> 更新",

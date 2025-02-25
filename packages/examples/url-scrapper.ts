@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { ReactAgent } from "packages/core/agents/react";
-import { WebScraperTool } from "packages/core/tools/web-scrapper";
+import { ReactAgent } from '../core/agents/react';
+import { WebScraperTool } from "../core/tools/web-scrapper";
 
 const OPENAI_API_KEY = 'openai_api_key';
 

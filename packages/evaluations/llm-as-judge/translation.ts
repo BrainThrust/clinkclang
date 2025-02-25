@@ -1,17 +1,18 @@
-import { Agent } from "@/agent-core/agents/base";
+import { ReactAgent } from "../../core/agents/react";
 import { Translation } from "autoevals";
 
 // this is a test to determine whether an `output` is as good of a translation of the `input` in the specified `language` as an expert
-const OPENAI_API_KEY = "openai_api_key";
+const OPENAI_API_KEY = 'openai_api_key';
 
 async function runTranslationTest() {
   try {
-      const agent = new Agent({
-      providerName: "openai",
-      modelName: "gpt-4o",
-      apiKey: OPENAI_API_KEY,
-    });
-
+    const agent = new ReactAgent({
+      provider: {
+        type: "openai",
+        apiKey: OPENAI_API_KEY,
+        modelName: "gpt-3.5-turbo",
+      }
+    })
     // english -> french
     const input = "Translate 'Goodbye' to French";
     const expected = "Au revoir";

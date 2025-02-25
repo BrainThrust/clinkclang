@@ -1,16 +1,18 @@
-import { Agent } from "@/agent-core/agents/base";
+import { ReactAgent } from "../../core/agents/react";
 import { Humor } from "autoevals";
 
 // check if output is funny
-const OPENAI_API_KEY = "openai_api_key";
+const OPENAI_API_KEY = 'openai_api_key';
 
 async function runHumorTest() {
   try {
-    const agent = new Agent({
-      providerName: "openai",
-      modelName: "gpt-4o",
-      apiKey: OPENAI_API_KEY,
-    });
+    const agent = new ReactAgent({
+      provider: {
+        type: "openai",
+        apiKey: OPENAI_API_KEY,
+        modelName: "gpt-3.5-turbo",
+      },
+    })
 
     // funny content
     const input1 = "Tell me a funny joke about coding";

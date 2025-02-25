@@ -1,6 +1,6 @@
-import { BaseMemory } from 'packages/core/memory/memory';
-import { MemoryMessage, MemorySummary } from 'packages/core/schema/memory-schema';
-import { BaseProvider } from 'packages/core/providers/base-provider';
+import { BaseMemory } from './base-memory';
+import { MemoryMessage, MemorySummary } from '../schema/memory-schema';
+import { BaseProvider } from '../providers/base-provider';
 
 const DEFAULT_SUMMARIZE_PROMPT = `Condense this conversation history while preserving key details, 
 relationships between questions and answers, and technical specifics. Include important numbers, 
@@ -42,7 +42,6 @@ export class ShortTermMemory extends BaseMemory {
 				originalTokens: summary.originalTokens,
 				summaryDate: summary.summaryDate
 			});
-
 			this.messages = [...[message], ...toKeep];
 		}
 	}

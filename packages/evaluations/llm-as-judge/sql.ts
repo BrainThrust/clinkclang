@@ -1,17 +1,18 @@
-import { Agent } from "@/agent-core/agents/base";
+import { ReactAgent } from "../../core/agents/react";
 import { Sql } from "autoevals";
 
 // The idea is to test whether an SQL query is semantically the same as a reference (output) query.
-const OPENAI_API_KEY = "openai_api_key";
+const OPENAI_API_KEY = 'openai_api_key';
 
 async function runSQLTest() {
   try {
-    const agent = new Agent({
-      providerName: "openai",
-      modelName: "gpt-4o",
-      apiKey: OPENAI_API_KEY,
-    });
-
+    const agent = new ReactAgent({
+      provider: {
+        type: "openai",
+        apiKey: OPENAI_API_KEY,
+        modelName: "gpt-3.5-turbo",
+      },
+    })
     // SQL query generation
     const prompt = "Write a SQL query to select users older than 30";
     const expectedQuery = "SELECT * FROM users WHERE age > 30;";

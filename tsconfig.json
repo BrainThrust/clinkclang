@@ -12,11 +12,13 @@
       "baseUrl": ".",
       "paths": {
         "@/agent-core/*": ["packages/agent-core/*"],
+        "@/agent-evals/*": ["packages/agent-evals/*"],
+        "@/agent-examples/*": ["packages/agent-examples/*"],
         "@/agent-functions/*": ["packages/agent-functions/*"],
+        "@/agent-strategies/*": ["packages/agent-strategies/*"],
         "@/agent-tools/*": ["packages/agent-tools/*"],
         "@/agent-workflows/*": ["packages/agent-workflows/*"],
-        "@/agent-examples/*": ["packages/agent-examples/*"],
-        "@/agent-strategies/*": ["packages/agent-strategies/*"]
+        "@/cli/*": ["packages/cli/*"]
       },
     }
   }

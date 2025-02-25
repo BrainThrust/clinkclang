@@ -1,6 +1,6 @@
 import Tesseract from "tesseract.js";
 import { z } from "zod";
-import { Tool } from "packages/core/tools/tool";
+import { Tool } from "./tool";
 
 export const ImageProcessorTool: Tool = {
   name: "extractImage",

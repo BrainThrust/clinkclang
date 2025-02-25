@@ -1,10 +1,9 @@
 ---
-layout: githubMarkdownLight
+layout: docs
 title: Agents
 date: '2025-01-27'
 description: 'How to use agents'
 ---
-# Agents
 
 The Agent Core is a flexible system that enables integration with various AI providers and frameworks while managing conversation flow and tool usage.
 

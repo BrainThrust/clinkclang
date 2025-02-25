@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { Agent, AgentConfig } from '@/agent-core/agents/base';
-import { ModelResponse } from 'packages/core/schema/core-schema';
-import { REACT_PROMPT } from 'packages/core/agents/prompt-templates/react-prompt';
+import { Agent, AgentConfig } from './base';
+import { ModelResponse } from '../schema/core-schema';
+import { REACT_PROMPT } from './prompt-templates/react-prompt';
 
 export class ReactAgent extends Agent {
 	private maxIterations: number;

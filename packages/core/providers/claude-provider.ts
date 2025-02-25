@@ -1,5 +1,5 @@
-import { BaseProvider } from "packages/core/providers/base-provider";
-import { Message, ModelResponse, ModelConfig } from "packages/core/schema/core-schema";
+import { BaseProvider } from "../providers/base-provider";
+import { Message, ModelResponse, ModelConfig } from "../schema/core-schema";
 
 export class ClaudeProvider extends BaseProvider {
   systemPrompt?: string;

@@ -1,5 +1,5 @@
 // TODO: complete the implementation of long-term memory
-import { BaseMemory } from "packages/core/memory/memory";
+import { BaseMemory } from "packages/core/memory/base-memory";
 import { MemorySection } from "packages/core/schema/memory-schema";
 import { getEmbeddingsOpenAI } from "packages/functions/memory/get-embeddings-openai";
 import { memoryTable } from "./db/schema";
