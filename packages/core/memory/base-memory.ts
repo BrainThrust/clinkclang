@@ -1,13 +1,12 @@
 import { MemoryMessage, MemorySummary } from '../schema/memory-schema';
 
 export abstract class BaseMemory {
-  abstract addMessage(message: MemoryMessage): Promise<void>;
-  abstract getMessages(): MemoryMessage[];
-  abstract getSummaries(): MemorySummary[];
+  abstract addMessage(message: Omit<MemoryMessage, 'tokens' | 'createdAt'>): Promise<void>;
+  abstract getMessages(): Promise<MemoryMessage[]>;
+  abstract getSummaries(): Promise<MemorySummary[]>;
   abstract getTokenUsage(): number;
-  abstract clear(): void;
+  abstract clear(): Promise<void>;
   
-
   protected calculateTokens(content: string): number {
     return Math.ceil(content.length / 4) + 4; 
   }

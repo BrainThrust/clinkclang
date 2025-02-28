@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { Agent, AgentConfig } from './base';
 import { ModelResponse } from '../schema/core-schema';
 import { REACT_PROMPT } from './prompt-templates/react-prompt';
+import { MemoryManager } from '../memory/memory-manager';
 
 export class ReactAgent extends Agent {
 	private maxIterations: number;
@@ -23,6 +24,11 @@ export class ReactAgent extends Agent {
 
 	async generate(input: string): Promise<string> {
 		this.debugLog('Starting ReAct strategy with input:', input);
+
+		// get relevant context for the input
+		await this.retrieveRelevantContextForInput(input);
+
+		// intialize the context with the input
 		await this.initializeContext(input, Boolean(this.config.outputSchema));
 
 		let iteration = 0;
@@ -66,13 +72,43 @@ export class ReactAgent extends Agent {
 		return finalAnswer;
 	}
 
-	private async initializeContext(input: string, hasSchema: boolean) {
-		await this.memory.addMessage({
-			role: 'user',
-			content: input,
-			metadata: { type: 'user_input', priority: 2 }
-		});
+	private async retrieveRelevantContextForInput(input: string): Promise<void> {
+		// check if longterm memory is specified
+		if (this.memory instanceof MemoryManager && this.memory.isLongTermEnabled()) {
+			this.debugLog('Retrieving relevant context from long-term memory');
 
+			try {
+				const relevantMessages = await this.retrieveRelevantMemory(input, 1000);
+
+				if (relevantMessages.length > 0) {
+					this.debugLog(
+						`Found ${relevantMessages.length} relevant messages from past conversations`
+					);
+
+					// format it
+					const contextContent = relevantMessages
+						.map(
+							(msg) =>
+								`${msg.role.toUpperCase()} (${new Date(msg.createdAt).toLocaleString()}): ${msg.content}`
+						)
+						.join('\n\n');
+
+					await this.memory.addMessage({
+						role: 'system',
+						content: `Relevant context from previous conversations:\n\n${contextContent}`,
+						metadata: { type: 'historical_context', priority: 2 }
+					});
+				} else {
+					this.debugLog('No relevant historical context found');
+				}
+			} catch (error) {
+				this.debugLog('Error retrieving context:', error);
+			}
+		}
+	}
+
+	private async initializeContext(input: string, hasSchema: boolean) {
+		// always add the ReAct prompt first to ensure it's preserved
 		const reactPrompt = REACT_PROMPT(this.tools.length > 0, hasSchema);
 		await this.memory.addMessage({
 			role: 'system',
@@ -80,6 +116,7 @@ export class ReactAgent extends Agent {
 			metadata: { type: 'system_prompt', priority: 3 }
 		});
 
+		// add tools list as a preserved system message
 		if (this.tools.length > 0) {
 			const toolsContent = `Tools:\n${this.tools.map((t) => `${t.name}: ${t.description}`).join('\n')}`;
 			await this.memory.addMessage({
@@ -88,15 +125,24 @@ export class ReactAgent extends Agent {
 				metadata: { type: 'tools_list', priority: 2 }
 			});
 		}
+
+		// add user input last
+		await this.memory.addMessage({
+			role: 'user',
+			content: input,
+			metadata: { type: 'user_input', priority: 2 }
+		});
 	}
 
 	private async generateStep(): Promise<ModelResponse> {
-		return this.provider.generateResponse(
-			this.memory.getMessages().map((msg) => ({
-				role: msg.role,
-				content: msg.content
-			}))
-		);
+		const memoryMessages = await this.memory.getMessages();
+		const messages = memoryMessages.map((msg) => ({
+			role: msg.role,
+			content: msg.content
+		}));
+
+		this.debugLog('[GENERATE] Sending', messages.length, 'messages to model');
+		return this.provider.generateResponse(messages);
 	}
 
 	private parseResponse(content: string) {
@@ -193,11 +239,19 @@ export class ReactAgent extends Agent {
 
 	private async retryWithSchema(errors: z.ZodIssue[], schema: z.ZodSchema): Promise<string> {
 		const errorList = errors.map((e) => `- ${e.path.join('.')}: ${e.message}`);
+
+		// create a more explicit example for the schema
+		let schemaExample = '';
+		if (schema instanceof z.ZodObject) {
+			const example = this.generateSchemaExample(schema);
+			schemaExample = `Example of valid format:\n\`\`\`json\n${JSON.stringify(example, null, 2)}\n\`\`\``;
+		}
 		const retryMessage = [
 			'Validation failed. Issues:',
 			...errorList,
 			'Required format:',
-			this.generateSchemaPrompt(schema)
+			this.generateSchemaPrompt(schema),
+			schemaExample
 		].join('\n');
 
 		await this.memory.addMessage({
@@ -207,6 +261,22 @@ export class ReactAgent extends Agent {
 		});
 
 		return '';
+	}
+
+	// added helper
+	private generateSchemaExample(schema: z.ZodObject<any>): any {
+		return Object.entries(schema.shape).reduce(
+			(acc, [key, value]) => {
+				const zodValue = value as z.ZodTypeAny;
+				if (zodValue instanceof z.ZodArray && zodValue.element instanceof z.ZodObject) {
+					acc[key] = [this.generateSchemaExample(zodValue.element)];
+				} else {
+					acc[key] = this.getTypeExample(zodValue);
+				}
+				return acc;
+			},
+			{} as Record<string, any>
+		);
 	}
 
 	private handleError(error: unknown, iteration: number) {
@@ -237,11 +307,11 @@ export class ReactAgent extends Agent {
 				success: false,
 				error: new z.ZodError([
 					{
-					code: 'invalid_type',
-					expected: 'object',
-					received: 'string',
-					path: [],
-					message: `Malformed JSON: ${error instanceof Error ? error.message : 'Unknown error'}`
+						code: 'invalid_type',
+						expected: 'object',
+						received: 'string',
+						path: [],
+						message: `Malformed JSON: ${error instanceof Error ? error.message : 'Unknown error'}`
 					}
 				])
 			};
