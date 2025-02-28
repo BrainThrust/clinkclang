@@ -1,10 +1,7 @@
 import { BaseMemory } from './base-memory';
 import { MemoryMessage, MemorySummary } from '../schema/memory-schema';
-import { BaseProvider } from '../providers/base-provider';
-
-const DEFAULT_SUMMARIZE_PROMPT = `Condense this conversation history while preserving key details, 
-relationships between questions and answers, and technical specifics. Include important numbers, 
-names, and concepts:`;
+import { BaseProvider } from '../providers/llm-providers/base-llm';
+import { SUMMARIZE_PROMPT } from './prompt-templates/summarize-prompt';
 
 export class ShortTermMemory extends BaseMemory {
 	private messages: MemoryMessage[] = [];
@@ -13,13 +10,13 @@ export class ShortTermMemory extends BaseMemory {
 	private provider: BaseProvider;
 
 	constructor(config: {
-		provider: BaseProvider;
+		provider: BaseProvider;	
 		tokenLimit?: number;
 		initialMessages?: MemoryMessage[];
 	}) {
 		super();
 		this.provider = config.provider;
-		this.tokenLimit = config.tokenLimit || 4000;
+		this.tokenLimit = config.tokenLimit || 4000; // TODO: custom choice
 		this.messages = config.initialMessages || [];
 	}
 
@@ -30,21 +27,26 @@ export class ShortTermMemory extends BaseMemory {
 	}
 
 	private async manageMemory(): Promise<void> {
+		const currentUsage = this.getTokenUsage();
+		
 		while (this.getTokenUsage() > this.tokenLimit) {
-			const { toKeep, toSummarize } = this.splitMessages();
-
-			if (toSummarize.length === 0) break;
-
-			const summary = await this.createSummary(toSummarize);
-			this.summaries.push(summary);
-
-			const message = this.createMessage('system', summary.content, {
-				originalTokens: summary.originalTokens,
-				summaryDate: summary.summaryDate
-			});
-			this.messages = [...[message], ...toKeep];
+		  const { toKeep, toSummarize } = this.splitMessages();
+	  
+		  if (toSummarize.length === 0) {
+			break;
+		  }
+	  
+		  console.log(`Summarizing ${toSummarize.length} messages...`);
+		  const summary = await this.createSummary(toSummarize);
+		  this.summaries.push(summary);
+	  
+		  const message = this.createMessage('system', summary.content, {
+			originalTokens: summary.originalTokens,
+			summaryDate: summary.summaryDate
+		  });
+		  this.messages = [...[message], ...toKeep];
 		}
-	}
+	  }
 
 	private splitMessages(): { toKeep: MemoryMessage[]; toSummarize: MemoryMessage[] } {
 		let tokenCount = 0;
@@ -64,7 +66,6 @@ export class ShortTermMemory extends BaseMemory {
 				}
 			}
 		}
-
 		return { toKeep, toSummarize };
 	}
 
@@ -73,7 +74,7 @@ export class ShortTermMemory extends BaseMemory {
 			.map((m) => `${m.role.toUpperCase()} (${new Date(m.createdAt).toISOString()}): ${m.content}`)
 			.join('\n\n');
 
-		const prompt = `${DEFAULT_SUMMARIZE_PROMPT}\n\n${conversation}`;
+		const prompt = `${SUMMARIZE_PROMPT}\n\n${conversation}`;
 		const response = await this.provider.generateResponse([
 			{
 				role: 'system',
@@ -89,11 +90,11 @@ export class ShortTermMemory extends BaseMemory {
 		};
 	}
 
-	getMessages(): MemoryMessage[] {
+	async getMessages(): Promise<MemoryMessage[]> {
 		return [...this.messages];
 	}
 
-	getSummaries(): MemorySummary[] {
+	async getSummaries(): Promise<MemorySummary[]> {
 		return [...this.summaries];
 	}
 
@@ -104,7 +105,7 @@ export class ShortTermMemory extends BaseMemory {
 		);
 	}
 
-	clear(): void {
+	async clear(): Promise<void> {
 		this.messages = [];
 		this.summaries = [];
 	}

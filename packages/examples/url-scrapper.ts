@@ -20,12 +20,12 @@ const agent = new ReactAgent({
 		type: 'openai',
 		apiKey: OPENAI_API_KEY,
 		modelName: 'gpt-4o',
-		temperature: 0
+		temperature: 0.3
 	},
 	tools: [new WebScraperTool()],
 	structure: {
 		debug: true,
-		maxRetries: 3,
+		maxRetries: 5,
 	},
   outputSchema: { 
     name: "IMFAnalysisSchema",

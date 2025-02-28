@@ -1,4 +1,4 @@
-import { BaseProvider } from "../providers/base-provider";
+import { BaseProvider } from "./base-llm";
 import {
   Message,
   ModelResponse,
