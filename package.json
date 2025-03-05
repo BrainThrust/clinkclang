@@ -20,7 +20,7 @@
     "name": "BrianLYS",
     "url": "https://github.com/BrianLYS"
   },
-  "license": "MIT",
+  "license": "Elastic License 2.0 (ELv2)",
   "dependencies": {
     "zod": "^3.24.1"
   },
