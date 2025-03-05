@@ -1,5 +1,5 @@
 <!-- src/lib/components/AgentProgressAug.svelte -->
-<script>
+<script lang="ts">
 	import { onDestroy } from 'svelte';
 	import { writable, derived } from 'svelte/store';
 	import { Button } from '$lib/components/ui/button';
@@ -21,12 +21,12 @@
 		totalSteps: 0
 	});
 	export let onStop = async () => {};
-	export let onResume = async (currentAction) => ({
+	export let onResume = async (currentAction: string) => ({
 		status: 'Running',
 		currentAction,
 		totalSteps: 0
 	});
-	export let updateProgress = async (currentStep) => ({
+	export let updateProgress = async (currentStep: number) => ({
 		status: 'Running',
 		currentAction: '',
 		progress: 0,
@@ -47,7 +47,7 @@
 	});
 
 	// Timer store
-	const timerStore = writable(null);
+	const timerStore = writable<ReturnType<typeof setTimeout> | null>(null);
 
 	// Derived values for easier access
 	const agentState = derived(agentStore, ($store) => ({
@@ -81,7 +81,7 @@
 		$agentStore.currentAction = 'Resuming workflow...';
 	}
 
-	function startSuccess(totalSteps, status, currentAction) {
+	function startSuccess(totalSteps: number, status: string, currentAction: string) {
 		$agentStore = {
 			...$agentStore,
 			currentAction,
@@ -95,7 +95,7 @@
 		};
 	}
 
-	function stopSuccess(prevState) {
+	function stopSuccess(prevState: any) {
 		$agentStore = {
 			...$agentStore,
 			status: 'Paused',
@@ -106,7 +106,7 @@
 		};
 	}
 
-	function resumeSuccess(totalSteps, status, currentAction) {
+	function resumeSuccess(totalSteps: number, status: string, currentAction: string) {
 		$agentStore = {
 			...$agentStore,
 			currentAction,
@@ -118,7 +118,7 @@
 		};
 	}
 
-	function updateSuccess(state) {
+	function updateSuccess(state: any) {
 		$agentStore = {
 			...$agentStore,
 			status: state.status,
@@ -159,12 +159,17 @@
 	}
 
 	$: if ($agentState.pending || !$agentState.running) {
-		clearTimeout($timerStore);
-		console.log('Cleared timeout', $timerStore);
+		if ($timerStore !== null) {
+			clearTimeout($timerStore);
+			console.log('Cleared timeout', $timerStore);
+		}
 	}
 
 	onDestroy(() => {
-		clearTimeout($timerStore);
+		if ($timerStore !== null) {
+			clearTimeout($timerStore);
+			console.log('Cleared timeout', $timerStore);
+		}
 	});
 </script>
 

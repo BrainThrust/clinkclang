@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AgentProgressAug from '$lib/components/ai/agent-progress/agent-progress-aug.svelte';
+	import * as AgentProgress from '$lib/components/ai/agent-progress';
 
 	async function handleStart() {
 		return {
@@ -13,7 +13,7 @@
 		console.log('Stopped');
 	}
 
-	async function handleResume(currentAction) {
+	async function handleResume(currentAction: string) {
 		return {
 			status: 'Running',
 			currentAction,
@@ -21,7 +21,7 @@
 		};
 	}
 
-	async function handleProgress(step) {
+	async function handleProgress(step: number) {
 		return {
 			status: 'Running',
 			currentAction: `Step ${step}`,
@@ -31,13 +31,14 @@
 	}
 </script>
 
-<AgentProgressAug
+<AgentProgress.AgentProgressAug
 	agentName="Agent 1"
 	description="This is a description of the agent"
-	imgLink="brainthrust.png"
+	imgLink="/brainthrust.png"
 	onStart={handleStart}
 	onStop={handleStop}
 	onResume={handleResume}
 	updateProgress={handleProgress}
-	pollRateMs={2000}
+	pollRateMs={500}
 />
+

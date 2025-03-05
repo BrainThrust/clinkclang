@@ -1,0 +1,141 @@
+---
+layout: docs
+title: Agent Progress
+date: '2025-03-06'
+description: 'Component Docs'
+---
+
+<script lang="ts">
+	import * as Tabs from '$lib/components/ui/tabs';
+	import AgentProgress from '$lib/components/docs/agent-progress.svelte';
+</script>
+
+A simple agent progress component that displays the current state of the agent
+
+<Tabs.Root value="preview">
+	<Tabs.List>
+		<Tabs.Trigger value="preview">Preview</Tabs.Trigger>
+		<Tabs.Trigger value="react code">React Code</Tabs.Trigger>
+		<Tabs.Trigger value="svelte code">Svelte Code</Tabs.Trigger>
+	</Tabs.List>
+	<Tabs.Content value="preview">
+	
+
+		<AgentProgress />
+
+	</Tabs.Content>
+	<Tabs.Content value="react code">
+
+```js
+"use client";
+import React from "react";
+import { AgentProgress } from "lib/ai/components/AgentProgressAug";
+
+async function handleStart() {
+  return {
+    status: "Running",
+    currentAction: "Initializing",
+    totalSteps: 4,
+  };
+}
+
+async function handleStop() {
+  console.log("Stopped");
+}
+
+async function handleResume(currentAction: string) {
+  return {
+    status: "Running",
+    currentAction,
+    totalSteps: 4,
+  };
+}
+
+async function handleProgress(step: number) {
+  return {
+    status: "Running",
+    currentAction: `Step ${step}`,
+    progress: step + 1,
+    totalSteps: 5,
+  };
+}
+
+export default function Page() {
+  return (
+      <AgentProgress
+        agentName="Agent 1"
+        description="This is a description of the agent"
+        onStop={handleStop}
+        onStart={handleStart}
+        onResume={handleResume}
+        updateProgress={handleProgress}
+        imgLink="brainthrust.png"
+        pollRateMs={500}
+      />
+  );
+}
+```
+
+	</Tabs.Content>
+
+	<Tabs.Content value="svelte code">
+
+```js
+<script lang="ts">
+	import AgentProgressAug from '$lib/components/ai/agent-progress/agent-progress-aug.svelte';
+
+	async function handleStart() {
+		return {
+			status: 'Running',
+			currentAction: 'Initializing',
+			totalSteps: 4
+		};
+	}
+
+	async function handleStop() {
+		console.log('Stopped');
+	}
+
+	async function handleResume(currentAction: string) {
+		return {
+			status: 'Running',
+			currentAction,
+			totalSteps: 4
+		};
+	}
+
+	async function handleProgress(step: number) {
+		return {
+			status: 'Running',
+			currentAction: `Step ${step}`,
+			progress: step + 1,
+			totalSteps: 5
+		};
+	}
+</script>
+
+<AgentProgressAug
+	agentName="Agent 1"
+	description="This is a description of the agent"
+	imgLink="brainthrust.png"
+	onStart={handleStart}
+	onStop={handleStop}
+	onResume={handleResume}
+	updateProgress={handleProgress}
+	pollRateMs={500}
+/>
+```
+
+	</Tabs.Content>
+
+</Tabs.Root>
+
+## Installation
+
+```bash
+# Install the react component
+pnpm dlx clinkclang@latest add agent-progress
+
+# Install the svelte component
+pnpm dlx clinkclang@latest add agent-progress-svelte
+```

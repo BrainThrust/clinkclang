@@ -49,6 +49,11 @@ export const remoteComponentMapping: Record<string, RemoteComponent> = {
 		type: 'component',
 		path: 'components/agent-progress'
 	},
+	'agent-progress-svelte': {
+		url: 'github:BrainThrust/clinkclang/sites/docs/src/lib/components/ai/agent-progress',
+		type: 'component',
+		path: 'components/agent-progress'
+	},
 	tracker: {
 		url: 'github:BrainThrust/clinkclang/sites/docs/src/lib/components/ai/tracker',
 		type: 'component',
