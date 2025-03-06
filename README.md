@@ -1,6 +1,8 @@
 # Clinkclang
 
-The Point of this project is to create simple components in a shadcn style to copy and paste into other projects.
+Snap together smart web agents in one shot.
+
+ClinkClang is a reusable library with everything you need—components, orchestration, LLMs, memory, tools, and structured outputs—to build web app agents fast.
 
 ## Getting Started
 
