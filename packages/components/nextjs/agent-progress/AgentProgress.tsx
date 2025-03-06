@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
+import { Progress } from "./progress";
 
 const BUTTON_VARIANT = "outline";
 

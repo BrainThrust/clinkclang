@@ -44,6 +44,16 @@ export const remoteComponentMapping: Record<string, RemoteComponent> = {
 		type: 'logic',
 		path: 'workflows-examples'
 	},
+	'agent-progress': {
+		url: 'github:BrainThrust/clinkclang/packages/components/nextjs/agent-progress',
+		type: 'component',
+		path: 'components/agent-progress'
+	},
+	'agent-progress-svelte': {
+		url: 'github:BrainThrust/clinkclang/sites/docs/src/lib/components/ai/agent-progress',
+		type: 'component',
+		path: 'components/agent-progress'
+	},
 	tracker: {
 		url: 'github:BrainThrust/clinkclang/sites/docs/src/lib/components/ai/tracker',
 		type: 'component',

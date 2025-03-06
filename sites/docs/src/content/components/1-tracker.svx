@@ -2,7 +2,7 @@
 layout: docs
 title: Tracker
 date: '2025-02-16'
-description: 'Agent Docs'
+description: 'Component Docs'
 ---
 
 <script lang="ts">
