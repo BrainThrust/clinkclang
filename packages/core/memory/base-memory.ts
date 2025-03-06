@@ -1,4 +1,4 @@
-import { MemoryMessage, MemorySummary } from '../schema/memory-schema';
+import type { MemoryMessage, MemorySummary } from '../schema/memory-schema';
 
 export abstract class BaseMemory {
   abstract addMessage(message: Omit<MemoryMessage, 'tokens' | 'createdAt'>): Promise<void>;

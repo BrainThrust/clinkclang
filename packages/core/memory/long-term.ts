@@ -1,5 +1,5 @@
 import { BaseMemory } from './base-memory';
-import { MemoryMessage, MemorySummary } from '../schema/memory-schema';
+import type { MemoryMessage, MemorySummary } from '../schema/memory-schema';
 import { BaseProvider } from '../providers/llm-providers/base-llm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { eq, l2Distance, and, desc, sql } from 'drizzle-orm';

@@ -1,5 +1,5 @@
 import { BaseProvider } from "./base-llm";
-import { Message, ModelResponse, ModelConfig } from "packages/core/schema/core-schema";
+import type { Message, ModelResponse, ModelConfig } from "../../schema/core-schema";
 
 export class OpenAIProvider extends BaseProvider {
   constructor(config: ModelConfig) {

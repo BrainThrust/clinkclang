@@ -1,6 +1,6 @@
 import { ReactAgent } from '../core/agents/react';
 import crypto from 'crypto';
-import { MemoryMessage } from '../core/schema/memory-schema';
+import type { MemoryMessage } from '../core/schema/memory-schema';
 
 const OPENAI_API_KEY = 'openai_api_key';
 

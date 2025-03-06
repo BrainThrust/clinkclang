@@ -1,9 +1,9 @@
 import { BaseProvider } from "./base-llm";
-import {
+import type {
   Message,
   ModelResponse,
   ModelConfig,
-} from "packages/core/schema/core-schema";
+} from "../../schema/core-schema";
 
 export class DeepSeekProvider extends BaseProvider {
     constructor(config: ModelConfig) {

@@ -1,10 +1,10 @@
 import { config } from "dotenv";
 import {
   OpenAIEmbeddingResponseSchema,
-  OpenAIEmbeddingResponse,
-  OpenAIEmbedding,
   OpenAIEmbeddingSchema,
 } from "packages/core/schema/memory-shcema";
+
+import type { OpenAIEmbeddingResponse, OpenAIEmbedding } from "packages/core/schema/memory-shcema";
 config({ path: __dirname + "./../../../.env" });
 
 const ENDPOINT_URI = "https://api.openai.com/v1/embeddings";

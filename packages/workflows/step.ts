@@ -1,5 +1,5 @@
-import { ZodTypeAny, z } from 'zod';
-import { WorkflowContext } from './types';
+import { type ZodTypeAny, z } from 'zod';
+import type { WorkflowContext } from './types';
 
 type StepConfig = {
 	stepId: string;
