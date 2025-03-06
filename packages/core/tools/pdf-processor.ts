@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Tool } from "./tool";
+import type { Tool } from "./tool";
 import pdf from "pdf-parse";
 import { readFile } from "fs/promises";
 import path from "path";

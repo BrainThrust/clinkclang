@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { Agent, AgentConfig } from './base';
-import { ModelResponse } from '../schema/core-schema';
+import { Agent, type AgentConfig } from './base';
+import type { ModelResponse } from '../schema/core-schema';
 import { REACT_PROMPT } from './prompt-templates/react-prompt';
 import { MemoryManager } from '../memory/memory-manager';
 

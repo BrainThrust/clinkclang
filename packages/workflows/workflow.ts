@@ -1,12 +1,12 @@
 import { Step } from './step';
-import {
-	ExecutionStatus,
+import type {
 	ExecutionOutput,
 	WorkflowContext,
 	InitContext,
 	WorkflowInstance,
 	WorkflowConfig
 } from './types';
+import { ExecutionStatus } from './types';
 import { z } from 'zod';
 
 interface StepNeighbors {

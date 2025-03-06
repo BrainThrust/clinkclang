@@ -1,6 +1,6 @@
 import { ReactAgent } from '../core/agents/react';
 import { z } from 'zod';
-import { Tool } from '../core/tools/tool';
+import type { Tool } from '../core/tools/tool';
 
 const OPENAI_API_KEY = 'openai_api_key';
 

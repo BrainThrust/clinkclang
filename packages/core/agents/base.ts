@@ -3,12 +3,12 @@ import { BaseProvider } from '../providers/llm-providers/base-llm';
 import { OpenAIProvider } from '../providers/llm-providers/openai-llm';
 import { ClaudeProvider } from '../providers/llm-providers/claude-llm';
 import { DeepSeekProvider } from '../providers/llm-providers/deepseek-llm';
-import { Message, ModelResponse, Schema } from '../schema/core-schema';
-import { Tool } from '../tools/tool';
+import type { Message, ModelResponse, Schema } from '../schema/core-schema';
+import type { Tool } from '../tools/tool';
 import { ShortTermMemory } from '../memory/short-term';
-import { MemoryMessage } from '../schema/memory-schema';
+import type { MemoryMessage } from '../schema/memory-schema';
 import { MemoryManager } from '../memory/memory-manager';
-import {
+import type {
 	EmbeddingProvider,
 	EmbeddingProviderConfig
 } from '../providers/embedding-providers/base-embedding';

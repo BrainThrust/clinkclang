@@ -8,6 +8,7 @@
 		  "target": "ES2022",
       "skipLibCheck": true,
       "strict": true,
+		  "verbatimModuleSyntax": true,
       "noUncheckedIndexedAccess": true,
       "baseUrl": ".",
       "paths": {
