@@ -1,6 +1,6 @@
 {
     "name": "clinkclang",
-    "version": "0.0.13",
+    "version": "0.0.14",
     "author": {
         "name": "BrianLYS",
         "url": "https://github.com/BrianLYS"
@@ -13,7 +13,8 @@
     },
     "scripts": {
         "build": "tsc -p tsconfig.json",
-        "dev": "tsx bin/index.ts"
+        "dev": "tsx bin/index.ts",
+        "build-publish": "pnpm install && pnpm build && pnpm publish"
     },
     "dependencies": {
         "chalk": "^5.4.1",
