@@ -7,10 +7,57 @@ description: 'Component Docs'
 
 <script lang="ts">
 	import * as Tabs from '$lib/components/ui/tabs';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 	import AgentProgress from '$lib/components/docs/agent-progress.svelte';
+
+	const defaultTable = [
+		{
+			"Property": "agentName",
+			"Type": "string",
+			"Description": "Changes the name of the Agent"
+		},
+		{
+			"Property": "description",
+			"Type": "string",
+			"Description": "Changes the description of the Agent"
+		},
+		{
+			"Property": "imgLink",
+			"Type": "string",
+			"Description": "Reads an image link and changes the Avatar of the tracker component"
+		}
+	]
+
+		const augmentedTable = [
+		{
+			"Property": "onStart",
+			"Type": "function",
+			"Description": "Event handler that defines what should happen when the Start button is pressed"
+		},
+		{
+			"Property": "onStop",
+			"Type": "function",
+			"Description": "Event handler that defines what should happen when the Stop button is pressed"
+		},
+		{
+			"Property": "onResume",
+			"Type": "function",
+			"Description": "Event handler that defines what should happen when the Resume button is pressed"
+		},
+		{
+			"Property": "updateProgress",
+			"Type": "function",
+			"Description": "Function that polls an API to update the tracker component"
+		},
+		{
+			"Property": "pollRateMs",
+			"Type": "int",
+			"Description": "Time interval (ms) at which the component should poll the updateProgress function"
+		},
+	]
 </script>
 
-A simple agent progress component that displays the current state of the agent
+Provides a shadcn-based visual interface for you to control and track the state of your agent.
 
 <Tabs.Root value="preview">
 	<Tabs.List>
@@ -142,3 +189,72 @@ pnpm dlx shadcn-svelte@next add card
 pnpm dlx shadcn-svelte@next add progress
 pnpm dlx clinkclang@latest add agent-progress-svelte
 ```
+
+## API Reference
+### Customize your agent
+`agentName`, `description`, `imgLink` all modify your agent's looks on the component.
+```js
+<AgentProgress
+	agentName="BrainThrust Agent"
+	description="Running all your workflows!"
+	imgLink="brainthrust.png"
+/>
+```
+### No time to write logic? No problem!
+Use the augmented version of the component with built-in event handlers.
+Just pass in your event handlers!
+```js
+// define handleStart, handleStop, etc...
+<AgentProgressAug
+	// other props here...
+
+	onStart={handleStart}
+	onStop={handleStop}
+	onResume={handleResume}
+	updateProgress={handleProgress}
+	pollRateMs={500}
+/>
+```
+The above **augmented** component comes with built-in logic that runs your event handlers for you, complete with state management.
+
+### Your component, your rules
+The default `AgentProgress` component is completely modifiable, relying only on shadcn components. The following props are included by default:
+<table>
+<thead>
+  <tr>
+    {#each Object.keys(defaultTable[0]) as columnHeading}
+      <th>{columnHeading}</th>
+    {/each}
+  <tr/>
+</thead>
+<tbody>
+  {#each Object.values(defaultTable) as row}
+    <tr>
+      {#each Object.values(row) as cell}
+        <td>{cell}</td>
+      {/each}
+    </tr>
+  {/each}
+</tbody>
+</table>
+
+The following are included in the **augmented** version of the component:
+
+<table>
+<thead>
+  <tr>
+    {#each Object.keys(augmentedTable[0]) as columnHeading}
+      <th>{columnHeading}</th>
+    {/each}
+  <tr/>
+</thead>
+<tbody>
+  {#each Object.values(augmentedTable) as row}
+    <tr>
+      {#each Object.values(row) as cell}
+        <td>{cell}</td>
+      {/each}
+    </tr>
+  {/each}
+</tbody>
+</table>
