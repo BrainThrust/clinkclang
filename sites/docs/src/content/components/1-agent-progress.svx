@@ -184,6 +184,9 @@ export default function Page() {
 pnpm dlx clinkclang@latest add agent-progress
 
 # Install the svelte component
+pnpm dlx shadcn-svelte@next add avatar
+pnpm dlx shadcn-svelte@next add card
+pnpm dlx shadcn-svelte@next add progress
 pnpm dlx clinkclang@latest add agent-progress-svelte
 ```
 
