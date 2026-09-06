@@ -4,6 +4,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
+		"deploy:cloudflare": "pnpm run build && wrangler deploy",
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
@@ -19,6 +20,7 @@
 		"@iconify/svelte": "^4.2.0",
 		"@inlang/paraglide-js": "^1.11.8",
 		"@playwright/test": "^1.49.1",
+		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/adapter-vercel": "^5.5.2",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
@@ -39,7 +41,8 @@
 		"typescript": "^5.0.0",
 		"vaul-svelte": "1.0.0-next.3",
 		"vite": "^6.0.0",
-		"vitest": "^3.0.0"
+		"vitest": "^3.0.0",
+		"wrangler": "^4.129.0"
 	},
 	"dependencies": {
 		"@inlang/paraglide-sveltekit": "^0.15.5",
