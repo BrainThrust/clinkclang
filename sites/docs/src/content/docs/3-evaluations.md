@@ -1,10 +1,9 @@
 ---
-layout: githubMarkdownLight
+layout: docs
 title: Evaluations
 date: '2025-01-27'
 description: 'Evaluating agent responses with AutoEvals'
 ---
-# Evaluations
 
 Clinkclang includes an evaluation system powered by **AutoEvals**, which uses **LLMs as judges** to assess various aspects of AI outputs. This system helps ensure quality, safety, and task-specific performance across your agent workflows.
 
@@ -32,7 +31,7 @@ const result = await Battle({
 });
 ```
 
-More examples for each evaluator can be found in the `packages/agent-evals` folder.
+More examples for each evaluator can be found in the `packages/evaluations` folder.
 
 ### Best Practices
 
