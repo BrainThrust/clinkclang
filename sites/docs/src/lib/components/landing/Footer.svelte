@@ -18,12 +18,7 @@
 				<h3 class="mb-4 font-semibold tracking-wider">{m.footer_system()}</h3>
 				<ul class="space-y-2 text-sm text-[#FF9B5C]/70">
 					<li>
-						<a href="#features" class="hover:text-[#FF9B5C] hover:underline"
-							>{m.footer_system_1()}</a
-						>
-					</li>
-					<li>
-						<a href="/docs" class="hover:text-[#FF9B5C] hover:underline">{m.footer_system_2()}</a>
+						<a href="/docs" class="hover:text-[#FF9B5C] hover:underline">{m.footer_system_1()}</a>
 					</li>
 				</ul>
 			</div>
